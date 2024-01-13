@@ -16,6 +16,7 @@ Welcome to our GitHub repository for the hackathon project aiming to become a GH
   - [Features](#features)
   - [Architecture](#architecture)
   - [Integration with Aave Protocol](#integration-with-aave-protocol)
+  - [Integration with Savvy Defi](#integration-with-savvy-defi)
   - [Integration with Chainlink](#integration-with-chainlink)
   - [Usage](#usage)
   - [Contributing](#contributing)
@@ -60,8 +61,6 @@ Describes the project structure briefly. Highlight important directories and fil
 
 ## Architecture
 
-## Architecture
-
 Our project's architecture is designed to facilitate cross-chain lending of whitelisted NFTs and minting GHO stablecoins using Aave protocol, with the integration of Chainlink's Cross Chain Interoperability Protocol (CCIP). Below are the key components and their interactions:
 
 ### Needed Contracts:
@@ -86,6 +85,11 @@ Our integration with Savvy DeFi introduces a unique dimension to our project, co
 ## Integration with Chainlink
 
 Our integration with Chainlink forms a crucial part of our project, enhancing cross-chain interoperability and ensuring seamless communication between different blockchain networks. Leveraging Chainlink's Cross Chain Interoperability Protocol (CCIP), our Protocol Contract facilitates the secure and transparent movement of data and assets across supported chains. This integration enables borrowers to initiate transactions from any chain, ensuring a decentralized and inclusive lending experience. Chainlink's robust infrastructure enhances the overall reliability of our cross-chain NFT lending solution, providing users with a trustworthy and scalable platform.
+
+### Other Technologies:
+
+1. **Wallet manager (Frontend)**
+  - [ConnectKit](https://github.com/family/connectkit)
 
 ## Usage
 
@@ -123,7 +127,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Thanks to Aave, Savvy, and Chainlink for their powerful protocols.
+- Thanks to Aave, Savvy, Chainlink, and Family for their powerful protocols.
 - Shoutout to the open-source community for their valuable contributions.
 
 Feel free to reach out to us for any questions or collaborations! Happy hacking!
