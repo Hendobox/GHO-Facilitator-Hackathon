@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.21;
 
 interface ICallWhitelist {
     // ============= Events ==============
@@ -10,7 +10,10 @@ interface ICallWhitelist {
 
     // ================ View Functions ================
 
-    function isWhitelisted(address callee, bytes4 selector) external view returns (bool);
+    function isWhitelisted(
+        address callee,
+        bytes4 selector
+    ) external view returns (bool);
 
     // ================ Update Operations ================
 

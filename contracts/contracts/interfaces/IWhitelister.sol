@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.20;
+pragma solidity ^0.8.20;
 
-contract IWhitelister {
+interface IWhitelister {
     // ============= Events ==============
 
     event WhitelistNFT(address indexed token, bool indexed whitelist);
-    event whitelistDestinationChain(
+    event WhitelistDestinationChain(
         uint64 indexed destinationChain,
         bool indexed whitelist
     );
@@ -22,5 +22,7 @@ contract IWhitelister {
 
     function isWhitelistedNFT(address token) external view returns (bool);
 
-    function isWhitelistedDestination(uint64  destinationChain) external view returns (bool);
+    function isWhitelistedDestination(
+        uint64 destinationChain
+    ) external view returns (bool);
 }
