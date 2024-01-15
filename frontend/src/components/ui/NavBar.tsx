@@ -1,3 +1,4 @@
+import { ConnectKitButton } from "connectkit"
 import { Link } from "react-router-dom"
 
 export default function NavBar() {
@@ -15,7 +16,7 @@ export default function NavBar() {
                     <Link to={"/borrow"}>Borrow</Link>
                 </li>
             </ul>
-            <button>Connect</button>
+            <ConnectKitButton />
         </nav>
     )
 }
