@@ -18,6 +18,9 @@ error Invalid_State();
 
 error Collateral_In_Use();
 
+error Exceeds_Balance();
+
+error Not_Unhealthy();
 // ==================== vault errors ====================
 
 error Already_Initialized();

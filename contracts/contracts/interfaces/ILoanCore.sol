@@ -34,7 +34,7 @@ interface ILoanCore {
 
     function repayDebt(uint256 loanId, uint256 amount) external;
 
-    // function claim(uint256 loanId, uint256 _amountFromLender) external;
+    function claim(uint256 loanId) external;
 
     // // ============== Nonce Management ==============
 

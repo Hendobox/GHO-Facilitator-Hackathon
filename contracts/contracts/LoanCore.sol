@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "./Whitelister.sol";
 import "./interfaces/ILoanCore.sol";
+import "./libraries/ChainlinkLib.sol";
 import "./libraries/FacilitatorLib.sol";
 
 contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
@@ -70,7 +71,7 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
         );
         if (collateralInUse[collateralKey]) revert Collateral_In_Use();
 
-        uint256 floorPriceUSD; // = Chainlink.getPrice(terms.collectionId);
+        uint256 floorPriceUSD = ChainlinkLib.getLatestPrice();
         uint256 maxBorrowable = calculateCollateralValue(floorPriceUSD);
 
         if (terms.principal > maxBorrowable)
@@ -94,7 +95,7 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
         loans[loanId] = LoanLibrary.LoanData({
             state: LoanLibrary.LoanState.Active,
             startDate: uint64(block.timestamp),
-            lastAccrualTimestam: uint64(block.timestamp),
+            lastAccrualTimestamp: uint64(block.timestamp),
             entryPrice: floorPriceUSD,
             balance: terms.principal,
             interestAmountPaid: 0,
@@ -163,11 +164,36 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
         uint256 loanId,
         uint256 amount
     ) external override nonReentrant {
+        LoanLibrary.LoanData memory data = loans[loanId];
+        LoanLibrary.LoanData storage _data = loans[loanId];
+        if (data.state != LoanLibrary.LoanState.Active) revert Invalid_State();
+
         uint256 interest = calculateInterest(loanId);
-        (
-            LoanLibrary.LoanData memory data,
-            uint256 amountFromPayer
-        ) = _handleRepay(loanId, interest, amount);
+
+        uint256 total = amount + interest;
+
+        // Check that the payment to principal is not greater than the balance
+        if (amount > data.balance) revert Exceeds_Balance();
+
+        // state changes
+        if (amount == data.balance) {
+            // If the payment is equal to the balance, the loan is repaid
+            _data.state = LoanLibrary.LoanState.Repaid;
+            // mark collateral as no longer escrowed
+            collateralInUse[
+                keccak256(
+                    abi.encode(
+                        data.terms.collateralAddress,
+                        data.terms.collateralId
+                    )
+                )
+            ] = false;
+            data = _data;
+        }
+
+        _data.interestAmountPaid += interest;
+        _data.balance -= amount;
+        _data.lastAccrualTimestamp = uint64(block.timestamp);
 
         // collect principal and interest from borrower
         GHO.safeTransferFrom(msg.sender, address(this), amount + interest);
@@ -186,6 +212,46 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
         emit LoanPayment(loanId);
     }
 
+    function claim(
+        uint256 loanId
+    ) external override whenNotPaused nonReentrant {
+        LoanLibrary.LoanData memory data = loans[loanId];
+        // Ensure valid initial loan state when claiming loan
+        if (data.state != LoanLibrary.LoanState.Active) revert Invalid_State();
+
+        uint256 floorPriceUSD = ChainlinkLib.getLatestPrice();
+        uint256 maxBorrowable = calculateCollateralValue(floorPriceUSD);
+
+        if (maxBorrowable > data.balance) revert Not_Unhealthy();
+
+        // State changes and cleanup
+        loans[loanId].state = LoanLibrary.LoanState.Defaulted;
+        collateralInUse[
+            keccak256(
+                abi.encode(
+                    data.terms.collateralAddress,
+                    data.terms.collateralId
+                )
+            )
+        ] = false;
+
+        uint256 interest = calculateInterest(loanId);
+        GHO.safeTransferFrom(
+            msg.sender,
+            address(this),
+            data.balance + interest
+        );
+
+        // Collateral redistribution
+        IERC721(data.terms.collateralAddress).safeTransferFrom(
+            address(this),
+            msg.sender,
+            data.terms.collateralId
+        );
+
+        emit LoanClaimed(loanId);
+    }
+
     function calculateCollateralValue(
         uint256 amount
     ) public pure returns (uint256) {
@@ -199,47 +265,11 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
 
         if (loanData.balance > 0) {
             uint256 timeSinceLastPayment = block.timestamp -
-                loanData.lastAccrualTimestam;
+                loanData.lastAccrualTimestamp;
 
             interestAmountDue =
                 (loanData.balance * timeSinceLastPayment * interestRate) /
                 (BASIS_POINTS_DENOMINATOR * 365 days);
         }
-    }
-
-    function _handleRepay(
-        uint256 loanId,
-        uint256 _interestAmount,
-        uint256 _paymentToPrincipal
-    ) internal returns (LoanLibrary.LoanData memory data, uint256 total) {
-        data = loans[loanId];
-        LoanLibrary.LoanData storage _data = loans[loanId];
-        if (data.state != LoanLibrary.LoanState.Active) revert Invalid_State();
-
-        total = _paymentToPrincipal + _interestAmount;
-
-        // Check that the payment to principal is not greater than the balance
-        if (_paymentToPrincipal > data.balance)
-            revert Exceeds_Balance(_paymentToPrincipal, data.balance);
-
-        // state changes
-        if (_paymentToPrincipal == data.balance) {
-            // If the payment is equal to the balance, the loan is repaid
-            _data.state = LoanLibrary.LoanState.Repaid;
-            // mark collateral as no longer escrowed
-            collateralInUse[
-                keccak256(
-                    abi.encode(
-                        data.terms.collateralAddress,
-                        data.terms.collateralId
-                    )
-                )
-            ] = false;
-        }
-
-        _data.interestAmountPaid += _interestAmount;
-        _data.balance -= _paymentToPrincipal;
-        _data.lastAccrualTimestamp = uint64(block.timestamp);
-        data = _data;
     }
 }
