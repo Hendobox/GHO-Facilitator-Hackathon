@@ -66,7 +66,7 @@ contract Whitelister is AccessControlEnumerable, IWhitelister {
         return _isWhitelistedDestination[destinationChain];
     }
 
-    function getChainId() private view returns (uint64 chainId) {
+    function getChainId() public view returns (uint64 chainId) {
         assembly {
             chainId := chainid()
         }

@@ -28,9 +28,11 @@ library LoanLibrary {
     struct LoanData {
         LoanState state;
         uint64 startDate;
-        uint64 entryPrice;
+        uint64 lastAccrualTimestam;
+        uint256 entryPrice;
         uint256 balance; // total principal minus amount of principal repaid
         uint256 interestAmountPaid;
+        uint256 allowance; // current borrow allowance
         LoanTerms terms;
     }
 }

@@ -14,6 +14,10 @@ error Exceeds_Maximum_Borrowable();
 
 error Invalid_Loan_State();
 
+error Invalid_State();
+
+error Collateral_In_Use();
+
 // ==================== vault errors ====================
 
 error Already_Initialized();
