@@ -1,7 +1,8 @@
 import { useState } from "react"
-import BorrowHeader from "../ui/borrow/BorrowHeader"
+import BorrowHeader from "../../ui/borrow/BorrowHeader"
 import { borrowSteps } from "@/constants/borrowSteps"
-import NavigationButtons from "../ui/borrow/NavigationButtons"
+import NavigationButtons from "../../ui/borrow/NavigationButtons"
+import DepositNFT from "./steps/depositNFT/DepositNFT"
 
 export default function Borrow() {
     const [step, setStep] = useState(0)
@@ -22,10 +23,19 @@ export default function Borrow() {
         setStep(newStep)
     }
 
+    const renderScreen = () => {
+        switch (step) {
+            case 0:
+                return <DepositNFT />
+            default:
+                return null
+        }
+    }
+
     return (
         <div className="h-[calc(90vh-104px)] flex flex-col justify-between text-white mx-28 border-t-[1px] border-[#3F3F46]">
             <BorrowHeader step={step} />
-            <span>Borrow</span>
+            {renderScreen()}
             <NavigationButtons handlePreviousStep={handlePreviousStep} handleNextStep={handleNextStep} />
         </div>
     )
