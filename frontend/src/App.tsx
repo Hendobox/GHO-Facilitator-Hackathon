@@ -1,7 +1,7 @@
 import NavBar from "@/components/ui/NavBar"
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom"
 import LandingPage from "@/components/screens/LandingPage"
-import Borrow from "@/components/screens/Borrow"
+import Borrow from "@/components/screens/borrow/Borrow"
 
 function App() {
 
