@@ -3,11 +3,16 @@ import BorrowHeader from "../../ui/borrow/BorrowHeader"
 import { borrowSteps } from "@/constants/borrowSteps"
 import NavigationButtons from "../../ui/borrow/NavigationButtons"
 import DepositNFT from "./steps/depositNFT/DepositNFT"
+import { InterfaceNFT } from "./steps/depositNFT/columns"
 
 export default function Borrow() {
     const [step, setStep] = useState(0)
+    const [selectedNFTs, setSelectedNFTs] = useState<InterfaceNFT[]>([])
 
     const handleNextStep = () => {
+        if (step === 0 && selectedNFTs.length === 0) {
+            return
+        }
         const newStep = step + 1
         if (newStep > borrowSteps.length - 1) {
             return
@@ -26,7 +31,7 @@ export default function Borrow() {
     const renderScreen = () => {
         switch (step) {
             case 0:
-                return <DepositNFT />
+                return <DepositNFT setSelectedNFTs={setSelectedNFTs} />
             default:
                 return null
         }

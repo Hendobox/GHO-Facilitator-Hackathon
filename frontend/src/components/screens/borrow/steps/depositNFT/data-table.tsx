@@ -1,5 +1,6 @@
 import {
     ColumnDef,
+    RowSelectionState,
     flexRender,
     getCoreRowModel,
     useReactTable,
@@ -13,18 +14,20 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { useState } from "react"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    rowSelection: RowSelectionState
+    setRowSelection: React.Dispatch<React.SetStateAction<RowSelectionState>>
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
+    rowSelection,
+    setRowSelection,
 }: DataTableProps<TData, TValue>) {
-    const [rowSelection, setRowSelection] = useState({})
     const table = useReactTable({
         data,
         columns,
@@ -38,7 +41,7 @@ export function DataTable<TData, TValue>({
 
     return (
         <>
-            <div className="rounded-md border">
+            <div>
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -67,7 +70,9 @@ export function DataTable<TData, TValue>({
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            <div className="flex flex-row justify-start">
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </div>
                                         </TableCell>
                                     ))}
                                 </TableRow>
@@ -82,9 +87,8 @@ export function DataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex-1 text-sm text-muted-foreground">
-                {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                {table.getFilteredRowModel().rows.length} row(s) selected.
+            <div className="flex-1 text-sm text-white">
+                Assets added: {table.getFilteredSelectedRowModel().rows.length}
             </div>
         </>
     )
