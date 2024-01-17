@@ -1,28 +1,22 @@
-import { CSSProperties, useState } from "react"
-import BorrowHeader from "../../ui/borrow/BorrowHeader"
-import NavigationButtons from "../../ui/borrow/NavigationButtons"
 import DashboardSelector from "@/components/ui/dashboard/Selector"
+import { useState } from "react"
 import DashboardSection from "./sections/Dashboard"
+import { DashboardSections } from "./types";
 
 export default function DashboardLayout() {
-
-    const lineStyle: CSSProperties = {
-        height: '88vh',
-        marginLeft: '24px',
-        marginRight: '40px',
-        borderColor: '#3F3F46',
-    }
+    const [selectedItem, setSelectedItem] = useState<DashboardSections>(DashboardSections.Dashboard);
 
     return (
-        <div className="h-[calc(90vh-104px) flex flex-row text-white mx-28 border-t-[1px] border-[#3F3F46]">
+        <div className="h-[calc(90vh-105px) flex flex-row text-white px-28 border-t-[1px] border-[#3F3F46]">
 
-            <DashboardSelector onSelectionChange={function (selectedItem: string): void {
-                console.log(selectedItem)
-            }} />
+            <DashboardSelector
+                selectedItem={selectedItem}
+                setSelectedItem={setSelectedItem}
+            />
 
             {/* vertical white line */}
-            <div style={lineStyle} className=' border-r-[1px]' />
-
+            <div className='ml-6 mr-10 h-[calc(100vh-105px)] border-r-[1px] border-[#3F3F46]' />
+            {selectedItem}
             <DashboardSection />
         </div>
     )

@@ -1,5 +1,6 @@
-import React, { CSSProperties, useState } from 'react';
+import { DashboardSections } from "@/components/screens/dashboard/types";
 import { motion } from 'framer-motion';
+import React, { CSSProperties } from 'react';
 
 interface ItemProps {
     title: string;
@@ -33,11 +34,11 @@ const Item: React.FC<ItemProps> = ({ title, isSelected, onSelect }) => {
 
 
 interface DashboardSelectorProps {
-    onSelectionChange: (selectedItem: string) => void;
+    selectedItem: DashboardSections;
+    setSelectedItem: (item: DashboardSections) => void;
 }
 
-const DashboardSelector: React.FC<DashboardSelectorProps> = ({ onSelectionChange }) => {
-    const [selectedItem, setSelectedItem] = useState<string>('Dashboard');
+const DashboardSelector: React.FC<DashboardSelectorProps> = ({ selectedItem, setSelectedItem }) => {
 
     const sidebarStyle: CSSProperties = {
         display: 'flex',
@@ -51,17 +52,16 @@ const DashboardSelector: React.FC<DashboardSelectorProps> = ({ onSelectionChange
         top: '144px'
     };
 
-    const handleSelect = (item: string) => {
+    const handleSelect = (item: DashboardSections) => {
         setSelectedItem(item);
-        onSelectionChange(item);
     };
 
     return (
         <div>
             <div style={sidebarStyle}>
-                <Item title="Dashboard" isSelected={selectedItem === 'Dashboard'} onSelect={() => handleSelect('Dashboard')} />
-                <Item title="Claim Assets" isSelected={selectedItem === 'Claim Assets'} onSelect={() => handleSelect('Claim Assets')} />
-                <Item title="Portfolio" isSelected={selectedItem === 'Portfolio'} onSelect={() => handleSelect('Portfolio')} />
+                <Item title="Dashboard" isSelected={selectedItem === DashboardSections.Dashboard} onSelect={() => handleSelect(DashboardSections.Dashboard)} />
+                <Item title="Claim Assets" isSelected={selectedItem === DashboardSections.ClaimAssets} onSelect={() => handleSelect(DashboardSections.ClaimAssets)} />
+                <Item title="Portfolio" isSelected={selectedItem === DashboardSections.Portfolio} onSelect={() => handleSelect(DashboardSections.Portfolio)} />
             </div>
         </div>
     );

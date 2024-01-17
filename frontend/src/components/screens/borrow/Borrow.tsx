@@ -38,7 +38,7 @@ export default function Borrow() {
     }
 
     return (
-        <div className="h-[calc(90vh-104px)] flex flex-col justify-between text-white mx-28 border-t-[1px] border-[#3F3F46]">
+        <div className="h-[calc(90vh-105px)] flex flex-col justify-between text-white px-28 border-t-[1px] border-[#3F3F46]">
             <BorrowHeader step={step} />
             {renderScreen()}
             <NavigationButtons handlePreviousStep={handlePreviousStep} handleNextStep={handleNextStep} />
