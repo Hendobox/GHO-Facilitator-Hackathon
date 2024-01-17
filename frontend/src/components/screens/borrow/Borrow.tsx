@@ -4,6 +4,7 @@ import { borrowSteps } from "@/constants/borrowSteps"
 import NavigationButtons from "../../ui/borrow/NavigationButtons"
 import DepositNFT from "./steps/depositNFT/DepositNFT"
 import { InterfaceNFT } from "./steps/depositNFT/columns"
+import LoanTerms from "./steps/loanTerms/LoanTerms"
 
 export default function Borrow() {
     const [step, setStep] = useState(0)
@@ -32,6 +33,8 @@ export default function Borrow() {
         switch (step) {
             case 0:
                 return <DepositNFT setSelectedNFTs={setSelectedNFTs} />
+            case 1:
+                return <LoanTerms />
             default:
                 return null
         }
@@ -39,8 +42,10 @@ export default function Borrow() {
 
     return (
         <div className="h-[calc(90vh-105px)] flex flex-col justify-between text-white px-28 border-t-[1px] border-[#3F3F46]">
-            <BorrowHeader step={step} />
-            {renderScreen()}
+            <div>
+                <BorrowHeader step={step} />
+                {renderScreen()}
+            </div>
             <NavigationButtons handlePreviousStep={handlePreviousStep} handleNextStep={handleNextStep} />
         </div>
     )
