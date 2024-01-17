@@ -2,29 +2,16 @@
 
 pragma solidity 0.8.21;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/access/extensions/AccessControlEnumerable.sol";
 import "./Errors.sol";
 import "./interfaces/IWhitelister.sol";
 
-contract Whitelister is AccessControlEnumerable, IWhitelister {
-    bytes32 public constant NFT_WHITELISTER_ROLE = keccak256("NFT_WHITELISTER");
-    bytes32 public constant DESTINATION_CHAIN_WHITELISTER_ROLE =
-        keccak256("DESTINATION_CHAIN_WHITELISTER");
-
+contract Whitelister is AccessControlEnumerable, Ownable, IWhitelister {
     mapping(address => bool) _isWhitelistedNFT;
     mapping(uint64 => bool) _isWhitelistedDestination;
 
-    constructor(
-        address nftWhitelister,
-        address destinationWhitelister,
-        bytes32 roleAdmin
-    ) {
-        _setRoleAdmin(NFT_WHITELISTER_ROLE, roleAdmin);
-        _grantRole(NFT_WHITELISTER_ROLE, nftWhitelister);
-
-        _setRoleAdmin(DESTINATION_CHAIN_WHITELISTER_ROLE, roleAdmin);
-        _grantRole(DESTINATION_CHAIN_WHITELISTER_ROLE, destinationWhitelister);
-
+    constructor(address admin) Ownable(admin) {
         // whitelist base network
         _isWhitelistedDestination[getChainId()] = true;
     }
@@ -40,10 +27,7 @@ contract Whitelister is AccessControlEnumerable, IWhitelister {
         _;
     }
 
-    function whitelistNFT(
-        address token,
-        bool whitelist
-    ) external onlyRole(NFT_WHITELISTER_ROLE) {
+    function whitelistNFT(address token, bool whitelist) external onlyOwner {
         _isWhitelistedNFT[token] = whitelist;
         emit WhitelistNFT(token, whitelist);
     }
@@ -51,7 +35,7 @@ contract Whitelister is AccessControlEnumerable, IWhitelister {
     function whitelistDestinationChain(
         uint64 destinationChain,
         bool whitelist
-    ) external onlyRole(DESTINATION_CHAIN_WHITELISTER_ROLE) {
+    ) external onlyOwner {
         _isWhitelistedDestination[destinationChain] = whitelist;
         emit WhitelistDestinationChain(destinationChain, whitelist);
     }

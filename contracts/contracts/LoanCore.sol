@@ -31,8 +31,6 @@ contract LoanCore is
 
     // =================== Constants =====================
 
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN");
-    bytes32 public constant ORIGINATOR_ROLE = keccak256("ORIGINATOR");
     uint256 private constant BASIS_POINTS_DENOMINATOR = 1e4;
 
     // =================== Loan State =====================
@@ -50,19 +48,15 @@ contract LoanCore is
     constructor(
         address usdc,
         address gho,
-        address nftWhitelister,
-        address destinationWhitelister,
-        bytes32 roleAdmin,
-        address router,
+        address owner_,
+        address ccipRouter,
         uint64 _destinationChainSelector
     )
-        Whitelister(nftWhitelister, destinationWhitelister, roleAdmin)
-        RiskManagementSender(router, _destinationChainSelector)
+        Whitelister(owner_)
+        RiskManagementSender(ccipRouter, _destinationChainSelector)
     {
         USDC = IERC20(usdc);
         GHO = IERC20(gho);
-        _grantRole(ADMIN_ROLE, msg.sender);
-        _setRoleAdmin(ADMIN_ROLE, DEFAULT_ADMIN_ROLE);
     }
 
     // ====================================== LIFECYCLE OPERATIONS ======================================
