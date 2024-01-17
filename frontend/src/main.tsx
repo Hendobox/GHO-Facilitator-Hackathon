@@ -1,3 +1,4 @@
+import "@fontsource/inter";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit"
 import React from 'react'
 import ReactDOM from 'react-dom/client'
