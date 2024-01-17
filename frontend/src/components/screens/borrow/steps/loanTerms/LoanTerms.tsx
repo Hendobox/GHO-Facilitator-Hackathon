@@ -1,7 +1,9 @@
-import CustomInput from "@/components/ui/CustomInput";
+import CustomInput, { Icon } from "@/components/ui/CustomInput";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { useEffect, useState } from 'react';
 
 type NetworkType = 'ETH' | 'BSC';
@@ -9,9 +11,10 @@ type NetworkType = 'ETH' | 'BSC';
 const LoanTerms = () => {
     const [amount, setAmount] = useState<string>('');
     const [address, setAddress] = useState<string>('');
+    const [checked, setChecked] = useState<boolean>(false);
     const [network, setNetwork] = useState<NetworkType>('ETH');
     const [interestRate, setInterestRate] = useState<number>();
-    
+
     const maxAmount = 1000;
     console.log("🚀 ~ LoanTerms ~ network:", network)
 
@@ -77,20 +80,53 @@ const LoanTerms = () => {
             </div>
             <div>
                 <div className="flex flex-row justify-between items-center">
-                    <span>Receiver:</span>
-                    <div>
-                        <Switch />
-                        <span>Same as borrower</span>
+                    <div className="flex flex-row items-center gap-2">
+                        <span>Select facilitator</span>
+                        <Icon icon="document" />
+                    </div>
+                    <div className="flex flex-row items-center gap-2">
+                        <motion.span
+                            initial={{ opacity: checked ? 1 : 0.5 }}
+                            animate={{ opacity: checked ? 0.5 : 1, scale: checked ? 0.95 : 1.05 }}
+                            transition={{ duration: 0.3, type: "spring" }}
+                        >
+                            Lenders
+                        </motion.span>
+                        <Switch
+                            checked={checked}
+                            onCheckedChange={setChecked}
+                        />
+                        <motion.span
+                            initial={{ opacity: checked ? 0.5 : 1 }}
+                            animate={{ opacity: checked ? 1 : 0.5, scale: checked ? 1.05 : 0.95 }}
+
+                            transition={{ duration: 0.3, type: "spring" }}
+                        >
+                            AaveV3
+                        </motion.span>
                     </div>
                 </div>
-                <CustomInput
-                    label="Enter an amount in GHO"
-                    value={amount}
-                    onChange={setAmount}
-                    placeholder="0.0"
-                    subtext="Amount cannot exceed xx.yy GHO"
-                    icon="document"
-                />
+                <div className="mt-5 flex flex-row justify-between gap-6">
+                    <div
+                        className={cn("w-1/2 p-6 text-zinc-400 bg-zinc-800 flex flex-col gap-2 rounded-[8px] border-2 border-transparent", { "border-violet-700": !checked })}
+                    >
+                        <span className="text-sm text-white">Lender</span>
+                        <span>
+                            Stake your collateral buffer on Savvy Defi and earn interest, enhancing your overall returns
+                        </span>
+                        <span>
+                            Leverage the power of your staked collateral buffer to enjoy reduced interest rates on your loan, maximizing your cost savings.
+                        </span>
+                    </div>
+                    <div
+                        className={cn("w-1/2 p-6 text-zinc-400 bg-zinc-800 flex flex-col gap-2 rounded-[8px] border-2 border-transparent", { "border-violet-700": checked })}
+                    >
+                        <span className="text-sm text-white">AaveV3</span>
+                        <span>
+                            Utilize the Aave facilitator to borrow without staking your collateral buffer. Enjoy the flexibility of withdrawing the remainder at any time, providing you with instant access to the full value of your collateral.
+                        </span>
+                    </div>
+                </div>
             </div>
         </div >
     );
