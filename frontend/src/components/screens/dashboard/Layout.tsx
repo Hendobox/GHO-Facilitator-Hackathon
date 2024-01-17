@@ -1,6 +1,8 @@
-import DashboardSelector from "@/components/ui/dashboard/Selector"
-import { useState } from "react"
-import DashboardSection from "./sections/Dashboard"
+import DashboardSelector from "@/components/ui/dashboard/Selector";
+import { useState } from "react";
+import ClaimAssetsSection from "./sections/ClaimAssets";
+import DashboardSection from "./sections/Dashboard";
+import PortfolioSection from "./sections/Portfolio";
 import { DashboardSections } from "./types";
 
 export default function DashboardLayout() {
@@ -16,8 +18,10 @@ export default function DashboardLayout() {
 
             {/* vertical white line */}
             <div className='ml-6 mr-10 h-[calc(100vh-105px)] border-r-[1px] border-[#3F3F46]' />
-            {selectedItem}
-            <DashboardSection />
+
+            {selectedItem === DashboardSections.Dashboard && <DashboardSection />}
+            {selectedItem === DashboardSections.ClaimAssets && <ClaimAssetsSection />}
+            {selectedItem === DashboardSections.Portfolio && <PortfolioSection />}
         </div>
     )
 }

@@ -22,6 +22,16 @@ export default function DashboardSection() {
         width: '54%'
     }
 
+    const headerStyle: CSSProperties = {
+        fontFamily: "Inter",
+        fontSize: "30px",
+        fontWeight: "600px",
+        lineHeight: "36px",
+        letterSpacing: "-0.0075em",
+        textAlign: "left",
+        marginBottom: "16px"
+    }
+
     const secondHalfDashContent: CSSProperties = {
         width: '42%'
     }
@@ -32,7 +42,9 @@ export default function DashboardSection() {
         <div style={layout}>
             <div style={dashContent}>
                 <div style={firstHalfDashContent}>
-                    Dashboard
+                    <div style={headerStyle}>
+                        Dashboard
+                    </div>
                 </div>
                 <div style={secondHalfDashContent}>
                     Second half of top section of dashboard (the huge card)
