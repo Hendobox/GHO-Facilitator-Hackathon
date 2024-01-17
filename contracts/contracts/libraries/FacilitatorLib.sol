@@ -35,20 +35,35 @@ library FacilitatorLib {
         uint256 amount,
         address recipient,
         uint256 minimumAmountOut
-    ) public {
-        savvyPool.depositBaseToken(
-            yieldToken,
-            amount,
-            recipient,
-            minimumAmountOut
-        );
+    ) public returns (uint256) {
+        return
+            savvyPool.depositBaseToken(
+                yieldToken,
+                amount,
+                recipient,
+                minimumAmountOut
+            );
     }
 
-    function repaySavvyGHO(
+    function withdrawSavvyGHO(
+        address owner_,
         address baseToken_,
         uint256 amount,
         address recipient
     ) public {
-        savvyPool.repayWithBaseToken(baseToken_, amount, recipient);
+        // savvyPool.withdrawBaseTokenFrom(
+        //     owner_,
+        //     baseToken_,
+        //     amount,
+        //     recipient,
+        //     1
+        // );
+    }
+
+    function convertSharesToBaseTokens(
+        address yieldToken,
+        uint256 amount
+    ) public view returns (uint256) {
+        // return savvyPool.convertSharesToBaseTokens(yieldToken, amount);
     }
 }

@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/Hendobox/GHO-Facilitator-Hackathon#readme",
   "devDependencies": {
+    "@aave/core-v3": "^1.19.0",
+    "@aave/deploy-v3": "^1.55.3",
+    "@aave/periphery-v3": "^2.5.0",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.3",
     "@nomicfoundation/hardhat-ethers": "^3.0.5",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.10",
@@ -39,7 +42,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@aave/core-v3": "^1.18.0",
+    "@chainlink/contracts": "^0.8.0",
+    "@chainlink/contracts-ccip": "^1.2.1",
     "@openzeppelin/contracts": "^5.0.1"
   }
 }

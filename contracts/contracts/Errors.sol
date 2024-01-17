@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.20;
+pragma solidity 0.8.21;
 
 // ==================== whitelister errors ====================
 
@@ -21,6 +21,7 @@ error Collateral_In_Use();
 error Exceeds_Balance();
 
 error Not_Unhealthy();
+
 // ==================== vault errors ====================
 
 error Already_Initialized();

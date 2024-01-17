@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.20;
+pragma solidity 0.8.21;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -8,17 +8,26 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "./Whitelister.sol";
+import "./RiskManagementSender.sol";
 import "./interfaces/ILoanCore.sol";
 import "./libraries/ChainlinkLib.sol";
 import "./libraries/FacilitatorLib.sol";
 
-contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
+contract LoanCore is
+    RiskManagementSender,
+    Whitelister,
+    ILoanCore,
+    Pausable,
+    ReentrancyGuard
+{
     using SafeERC20 for IERC20;
 
     // ============================================ STATE ==============================================
 
     IERC20 public USDC;
     IERC20 public GHO;
+    address public receiver;
+    address public destinationGHO;
 
     // =================== Constants =====================
 
@@ -43,8 +52,13 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
         address gho,
         address nftWhitelister,
         address destinationWhitelister,
-        bytes32 roleAdmin
-    ) Whitelister(nftWhitelister, destinationWhitelister, roleAdmin) {
+        bytes32 roleAdmin,
+        address router,
+        uint64 _destinationChainSelector
+    )
+        Whitelister(nftWhitelister, destinationWhitelister, roleAdmin)
+        RiskManagementSender(router, _destinationChainSelector)
+    {
         USDC = IERC20(usdc);
         GHO = IERC20(gho);
         _grantRole(ADMIN_ROLE, msg.sender);
@@ -71,7 +85,7 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
         );
         if (collateralInUse[collateralKey]) revert Collateral_In_Use();
 
-        uint256 floorPriceUSD = ChainlinkLib.getLatestPrice();
+        uint256 floorPriceUSD = uint256(ChainlinkLib.getLatestPrice());
         uint256 maxBorrowable = calculateCollateralValue(floorPriceUSD);
 
         if (terms.principal > maxBorrowable)
@@ -127,14 +141,10 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
         // send GHO to the borrower (borrowTo)
 
         if (terms.principal > 0) {
-            if (getChainId() == terms.destinationChain) {
-                GHO.safeTransfer(borrowTo, terms.principal);
-            } else {
-                // bridge with CCIP
-            }
+            GHO.safeTransfer(borrowTo, terms.principal);
         }
 
-        // evaluate available GHO for secondary pool
+        // evaluate available GHO for secondary pool in cross-chain with CCIP
         uint256 amountOverCollateralized = floorPriceUSD - maxBorrowable;
 
         if (maxBorrowable > terms.principal) {
@@ -145,19 +155,7 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
 
         /// enter Savvy for risk management revenue
 
-        // create the approval to savvy pool
-        GHO.approve(
-            address(FacilitatorLib.savvyPool),
-            amountOverCollateralized
-        );
-
-        // supply GHO into Savvy
-        FacilitatorLib.supplySavvyGHO(
-            address(GHO),
-            amountOverCollateralized,
-            address(this),
-            0
-        );
+        supplySavvyCCIP(receiver, amountOverCollateralized, msg.sender);
     }
 
     function repayDebt(
@@ -169,8 +167,6 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
         if (data.state != LoanLibrary.LoanState.Active) revert Invalid_State();
 
         uint256 interest = calculateInterest(loanId);
-
-        uint256 total = amount + interest;
 
         // Check that the payment to principal is not greater than the balance
         if (amount > data.balance) revert Exceeds_Balance();
@@ -219,7 +215,7 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
         // Ensure valid initial loan state when claiming loan
         if (data.state != LoanLibrary.LoanState.Active) revert Invalid_State();
 
-        uint256 floorPriceUSD = ChainlinkLib.getLatestPrice();
+        uint256 floorPriceUSD = uint256(ChainlinkLib.getLatestPrice());
         uint256 maxBorrowable = calculateCollateralValue(floorPriceUSD);
 
         if (maxBorrowable > data.balance) revert Not_Unhealthy();
@@ -236,6 +232,7 @@ contract LoanCore is Whitelister, ILoanCore, Pausable, ReentrancyGuard {
         ] = false;
 
         uint256 interest = calculateInterest(loanId);
+
         GHO.safeTransferFrom(
             msg.sender,
             address(this),
