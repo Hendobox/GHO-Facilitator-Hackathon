@@ -1,9 +1,20 @@
-export default function CollateralValue() {
+interface CollateralValueProps {
+    data: {}
+}
+
+function NoCollateral() {
+    return (
+        <div className="h-full flex flex-row justify-center items-center pb-4">
+            <div className="text-center text-sm font-medium leading-[24px] text-[#a1a1aa]">
+                No active collateral buffer
+            </div>
+        </ div>
+    )
+}
+
+function Collateral() {
     return (
         <>
-            <div className="text-sm font-['Inter'] font-medium leading-[24px] text-[#a1a1aa]">
-                Collateral value
-            </div>
             <div
                 className="mt-4 bg-[#27272a] flex flex-col justify-center pl-4 gap-3 w-full h-20 items-start rounded-lg"
             >
@@ -35,6 +46,18 @@ export default function CollateralValue() {
                     </div>
                 </div>
             </div>
+        </>
+    )
+}
+
+export default function CollateralValue(props: CollateralValueProps) {
+    return (
+        <>
+            <div className="text-sm font-['Inter'] font-medium leading-[24px] text-[#a1a1aa]">
+                Collateral value
+            </div>
+
+            {props.data ? <Collateral /> : <NoCollateral />}
         </>
     )
 }

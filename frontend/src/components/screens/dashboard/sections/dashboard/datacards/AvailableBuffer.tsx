@@ -1,9 +1,20 @@
-export default function AvailableBuffer() {
+interface AvailableBufferProps {
+    data: {}
+}
+
+function NoBuffer() {
+    return (
+        <div className="h-full flex flex-row justify-center items-center pb-4">
+            <div className="text-center text-sm font-medium leading-[24px] text-[#a1a1aa]">
+                No active collateral buffer
+            </div>
+        </ div>
+    )
+}
+
+function Buffer() {
     return (
         <>
-            <div className="text-sm font-['Inter'] font-medium leading-[24px] text-[#a1a1aa]">
-                Available collateral buffer
-            </div>
             <div
                 className="mt-4 bg-[#27272a] flex flex-col justify-center pl-4 gap-3 w-full h-20 items-start rounded-lg"
             >
@@ -32,6 +43,17 @@ export default function AvailableBuffer() {
                     </div>
                 </div>
             </div>
+        </>
+    )
+}
+
+export default function AvailableBuffer(props: AvailableBufferProps) {
+    return (
+        <>
+            <div className="text-sm font-['Inter'] font-medium leading-[24px] text-[#a1a1aa]">
+                Available collateral buffer
+            </div>
+            {props.data ? <Buffer /> : <NoBuffer />}
         </>
     )
 }

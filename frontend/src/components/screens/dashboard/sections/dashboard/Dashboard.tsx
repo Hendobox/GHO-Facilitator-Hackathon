@@ -2,11 +2,11 @@
 
 import Card from "@/components/ui/dashboard/Card";
 import { CSSProperties } from "react";
-import LoanSummary from "./cards/LoanSummary";
-import WalletBalance from "./cards/WalletBalance";
-import CollateralValue from "./cards/CollateralValue";
-import AvailableBuffer from "./cards/AvailableBuffer";
-import RepayLoan from "./cards/RepayLoan";
+import LoanSummary from "./datacards/LoanSummary";
+import WalletBalance from "./datacards/WalletBalance";
+import CollateralValue from "./datacards/CollateralValue";
+import AvailableBuffer from "./datacards/AvailableBuffer";
+import RepayLoan from "./datacards/RepayLoan";
 
 export default function DashboardSection() {
 
@@ -53,7 +53,7 @@ export default function DashboardSection() {
                     </div>
                     <div className="flex flex-row mb-3" >
                         <Card height="188px" width="331px">
-                            <LoanSummary />
+                            <LoanSummary data={{}} />
                         </Card>
                         <div className="w-3" />
                         <Card height="188px" width="331px">
@@ -62,17 +62,17 @@ export default function DashboardSection() {
                     </div>
                     <div className="flex flex-row">
                         <Card height="188px" width="331px">
-                            <CollateralValue />
+                            <CollateralValue data={{}} />
                         </Card>
                         <div className="w-3" />
                         <Card height="188px" width="331px" >
-                            <AvailableBuffer />
+                            <AvailableBuffer data={{}} />
                         </Card>
                     </div>
                 </div>
                 <div style={secondHalfDashContent}>
                     <Card height="457px" width="331px">
-                        <RepayLoan />
+                        <RepayLoan data={{}} />
                     </Card>
                 </div>
             </div>

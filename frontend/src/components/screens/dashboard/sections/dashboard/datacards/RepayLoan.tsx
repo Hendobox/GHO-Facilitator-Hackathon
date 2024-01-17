@@ -1,11 +1,31 @@
 import { Input } from "@/components/ui/input"
 
-export default function RepayLoan() {
+function NoActiveLoan() {
     return (
         <>
-            <div className="text-sm font-medium leading-[24px] text-[#a1a1aa] ml-1">
-                Repay loan
+            <div className="flex flex-col ml-10 pb-4 gap-2 w-2/3 h-full justify-center items-start">
+                <img
+                    src="https://file.rendit.io/n/gVsSrOhjLVEtIETl69tM.svg"
+                    alt="Vuesaxboldemojihappy"
+                    id="Vuesaxboldemojihappy"
+                    className="ml-16 w-16"
+                />
+                <div className="flex flex-col gap-1 w-full font-['Inter'] items-start">
+                    <div className="text-center text-sm font-medium leading-[24px] text-[#a1a1aa] ml-10">
+                        No active loans
+                    </div>
+                    <div className="text-center text-xs font-medium leading-[16px] text-[#52525b] w-full">
+                        No worries! You have no active loan to repay at this time
+                    </div>
+                </div>
             </div>
+        </>
+    )
+}
+
+function ActiveLoan() {
+    return (
+        <>
             <div className="mt-4 relative flex flex-row w-full items-start">
                 <div className="h-10 bg-[#5b21b6] absolute top-12 left-2 rounded" />
                 <div className="items-start bg-[#6d28d9] relative flex flex-col justify-center mb-1 pl-16 gap-1 w-full h-20 font-['Inter'] rounded-lg">
@@ -76,6 +96,20 @@ export default function RepayLoan() {
                     className="text-white">due date policy</a>
                 .
             </div>
+        </>
+    )
+}
+
+interface RepayLoanProps {
+    data: {}
+}
+export default function RepayLoan(props: RepayLoanProps) {
+    return (
+        <>
+            <div className="text-sm font-medium leading-[24px] text-[#a1a1aa] ml-1">
+                Repay loan
+            </div>
+            {props.data ? <ActiveLoan /> : <NoActiveLoan />}
         </>
     )
 }
