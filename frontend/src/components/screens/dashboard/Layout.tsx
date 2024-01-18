@@ -1,6 +1,6 @@
 import DashboardSelector from "@/components/ui/dashboard/Selector";
 import { useState } from "react";
-import ClaimAssetsSection from "./sections/ClaimAssets";
+import ClaimAssetsSection from "./sections/claimassets/ClaimAssets";
 import DashboardSection from "./sections/dashboard/Dashboard";
 import PortfolioSection from "./sections/Portfolio";
 import { DashboardSections } from "./types";

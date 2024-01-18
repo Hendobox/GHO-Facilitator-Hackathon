@@ -1,8 +1,10 @@
 
 
+import Card from "@/components/ui/dashboard/Card";
 import { CSSProperties } from "react";
+import RepayLoan from "../dashboard/datacards/RepayLoan";
 
-export default function ClaimAssetsSection() {
+export default function LoanRepaymentSection() {
 
     const layout: CSSProperties = {
         marginTop: '40px',
@@ -28,24 +30,27 @@ export default function ClaimAssetsSection() {
         lineHeight: "24px",
         letterSpacing: "0em",
         textAlign: "left",
-        marginBottom: "50px"
+        marginBottom: "50px",
+        color: "#A1A1AA"
     }
 
-    const assetsTable: CSSProperties = {
-    }
     return (
         <div style={layout}>
 
             <div style={headerStyle}>
-                Claim assets
+                Loan repayment
             </div>
             <div style={subHeaderBody}>
                 lorem ipsum color damut lorem ipsum color damut lorem ipsum color damut
             </div>
 
-            <div style={assetsTable}>
-                <div> Assets table </div>
+            <Card height="478px" width="956px" >
+                <RepayLoan data={{}} />
+            </Card>
+            <div className="mt-10">
+                <div> Loan collateral </div>
+                <div className="mt-4">Collateral table placeholder</div>
             </div>
-        </div>
+        </div >
     );
 }
