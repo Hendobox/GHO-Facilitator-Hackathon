@@ -11,9 +11,11 @@ interface DropDownSelectProps {
     values: string[];
     placeholder?: string;
     onValueChange: (value: string) => void;
+    color?: string
+    className?: string
 }
 
-export function DropDownSelect({ values, placeholder, onValueChange }: DropDownSelectProps) {
+export function DropDownSelect({ values, placeholder, onValueChange, color, className }: DropDownSelectProps) {
 
     const handleChange = (value: string) => {
         onValueChange(value);
@@ -22,7 +24,7 @@ export function DropDownSelect({ values, placeholder, onValueChange }: DropDownS
 
     return (
         <Select defaultValue={values[0]} onValueChange={handleChange}>
-            <SelectTrigger style={{ backgroundColor: '#3F3F46' }} className="w-[140px]">
+            <SelectTrigger style={{ backgroundColor: color ?? '#3F3F46' }} className={className ?? "w-[140px]"}>
                 <SelectValue placeholder={placeholder || values[0]} />
             </SelectTrigger>
             <SelectContent>

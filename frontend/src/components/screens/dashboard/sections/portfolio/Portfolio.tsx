@@ -1,6 +1,9 @@
 
 
+import { AccordionCard } from "@/components/ui/dashboard/AccordionCard";
 import { CSSProperties } from "react";
+import StakeAccordionCard from "./accordioncards/StakeAccordionCard";
+import WithdrawAccordionCard from "./accordioncards/WithDrawAccordionCard";
 
 export default function PortfolioSection() {
 
@@ -64,9 +67,6 @@ export default function PortfolioSection() {
         textAlign: "right",
     }
 
-    const assetsTable: CSSProperties = {
-        marginTop: "42px"
-    }
     return (
         <div style={layout}>
 
@@ -82,8 +82,14 @@ export default function PortfolioSection() {
                 <div style={ghoText}>{gho} GHO</div>
             </div>
 
-            <div style={assetsTable}>
-                <div> Stake and Withdraw Cards </div>
+            <div className="m-10" >
+                <AccordionCard title="Stake">
+                    <StakeAccordionCard />
+                </AccordionCard>
+                <div className="mt-10" />
+                <AccordionCard title="Withdraw">
+                    <WithdrawAccordionCard />
+                </AccordionCard>
             </div>
         </div>
     );
