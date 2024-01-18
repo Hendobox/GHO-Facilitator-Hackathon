@@ -1,7 +1,8 @@
-import NavBar from "@/components/ui/NavBar"
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom"
 import LandingPage from "@/components/screens/LandingPage"
 import Borrow from "@/components/screens/borrow/Borrow"
+import NavBar from "@/components/ui/NavBar"
+import { Toaster } from "@/components/ui/toaster"
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom"
 import DashboardLayout from "./components/screens/dashboard/Layout"
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/dashboard" element={<DashboardLayout />} />
                 </Routes>
             </Router>
+            <Toaster />
         </div>
     )
 }

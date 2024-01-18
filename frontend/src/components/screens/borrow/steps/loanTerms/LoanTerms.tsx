@@ -5,6 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useEffect, useState } from 'react';
+import { useToast } from "@/components/ui/use-toast"
 
 type NetworkType = 'ETH' | 'BSC';
 
@@ -14,6 +15,7 @@ const LoanTerms = () => {
     const [checked, setChecked] = useState<boolean>(false);
     const [network, setNetwork] = useState<NetworkType>('ETH');
     const [interestRate, setInterestRate] = useState<number>();
+    const { toast } = useToast();
 
     const maxAmount = 1000;
     console.log("🚀 ~ LoanTerms ~ network:", network)
@@ -94,7 +96,16 @@ const LoanTerms = () => {
                         </motion.span>
                         <Switch
                             checked={checked}
-                            onCheckedChange={setChecked}
+                            onCheckedChange={(value) => {
+                                console.log("🚀 ~ LoanTerms ~ value:", value)
+                                setChecked(value);
+                                toast({
+                                    title: "Interest rate changed!",
+                                    description: `New interest rates apply by changing to the ${value ? 'AaveV3' : 'Lenders'} facilitator.`,
+                                    variant: "ghost"
+                                });
+                            }
+                            }
                         />
                         <motion.span
                             initial={{ opacity: checked ? 0.5 : 1 }}
