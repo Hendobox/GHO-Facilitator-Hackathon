@@ -12,6 +12,7 @@ import "./RiskManagementSender.sol";
 import "./interfaces/ILoanCore.sol";
 import "./Chainlink.sol";
 import "./Facilitator.sol";
+import "hardhat/console.sol";
 
 contract LoanCore is
     RiskManagementSender,
@@ -28,6 +29,7 @@ contract LoanCore is
 
     IERC20 public USDC;
     IERC20 public GHO;
+    IERC20 public aTokenUSDC;
     address public receiver;
     address public destinationGHO;
 
@@ -37,7 +39,7 @@ contract LoanCore is
 
     // =================== Loan State =====================
 
-    uint256 private loanIdTracker;
+    uint256 public loanIdTracker;
     uint256 public interestRate = 1e3; // 10.00 %
 
     mapping(uint256 => LoanLibrary.LoanData) public loans;
@@ -50,8 +52,10 @@ contract LoanCore is
     constructor(
         address usdc,
         address gho,
+        address aTokenUsdc,
         address owner_,
         address ccipRouter,
+        address receiver_,
         uint64 _destinationChainSelector
     )
         Whitelister(owner_)
@@ -59,19 +63,19 @@ contract LoanCore is
     {
         USDC = IERC20(usdc);
         GHO = IERC20(gho);
+        aTokenUSDC = IERC20(aTokenUsdc);
+        receiver = receiver_;
     }
 
     // ====================================== LIFECYCLE OPERATIONS ======================================
 
     function startLoan(
-        address borrowTo,
         LoanLibrary.LoanTerms calldata terms
     )
         external
         override
         whenNotPaused
         onlyWhitelistedNFT(terms.collateralAddress)
-        onlyWhitelistedDestination(terms.destinationChain)
         nonReentrant
         returns (uint256 loanId)
     {
@@ -110,57 +114,93 @@ contract LoanCore is
             balance: terms.principal,
             interestAmountPaid: 0,
             allowance: maxBorrowable - terms.principal,
-            terms: terms
+            terms: terms,
+            owner: msg.sender
         });
 
         if (terms.facilitator == LoanLibrary.Facilitator.Native) {
             // handleNative();
         } else {
             // create the approval to aave pool
-            USDC.approve(address(aaveV3Pool), terms.principal);
+            USDC.approve(address(aaveV3Pool), maxBorrowable);
 
             // supply the asset to Aave
             supplyAaveUSDC(address(USDC), maxBorrowable, address(this));
 
-            // Borrow GHO
-            borrowAaveGHO(address(GHO), maxBorrowable, address(this));
-        }
+            (, , uint256 availableBorrowsBase, , , ) = getUserAccountData(
+                address(this)
+            );
 
-        // send GHO to the borrower (borrowTo)
+            // console.log("availableBorrowsBase: ", availableBorrowsBase);
 
-        if (terms.principal > 0) {
-            GHO.safeTransfer(borrowTo, terms.principal);
-        }
-
-        // evaluate available GHO for secondary pool in cross-chain with CCIP
-        uint256 amountOverCollateralized = floorPriceUSD - maxBorrowable;
-
-        if (maxBorrowable > terms.principal) {
-            unchecked {
-                amountOverCollateralized += maxBorrowable - terms.principal;
+            if (availableBorrowsBase > maxBorrowable) {
+                // Borrow GHO
+                borrowAaveGHO(address(GHO), maxBorrowable, address(this));
+            } else {
+                // handleNative();
             }
         }
 
-        /// enter Savvy for risk management revenue
+        // send GHO to the borrower
 
-        supplySavvyCCIP(receiver, amountOverCollateralized, msg.sender);
+        if (terms.principal > 0) {
+            GHO.safeTransfer(msg.sender, terms.principal);
+        }
+
+        // evaluate available GHO for secondary pool in cross-chain with CCIP
+
+        uint256 amountOverCollateralized = floorPriceUSD - maxBorrowable;
+        uint256 userBal = maxBorrowable - terms.principal;
+
+        // enter Savvy for risk management revenue
+
+        supplySavvyCCIP(
+            receiver,
+            amountOverCollateralized,
+            userBal,
+            msg.sender
+        );
     }
 
     function repayDebt(
         uint256 loanId,
-        uint256 amount
+        uint256 amountPlusInterest
     ) external override nonReentrant {
+        if (amountPlusInterest == 0) revert Zero_Amount();
+
         LoanLibrary.LoanData memory data = loans[loanId];
         LoanLibrary.LoanData storage _data = loans[loanId];
         if (data.state != LoanLibrary.LoanState.Active) revert Invalid_State();
+        if (data.owner != msg.sender) revert Unauthorized();
 
         uint256 interest = calculateInterest(loanId);
+        uint256 debt = data.balance + interest;
 
         // Check that the payment to principal is not greater than the balance
-        if (amount > data.balance) revert Exceeds_Balance();
+        if (amountPlusInterest > debt) revert Exceeds_Balance();
+
+        // collect principal and interest from borrower
+        GHO.safeTransferFrom(msg.sender, address(this), amountPlusInterest);
+
+        if (data.terms.facilitator == LoanLibrary.Facilitator.Native) {
+            // handleNativeRepay();
+        } else {
+            // (, uint256 totalDebtBase, , , uint256 ltv, ) = getUserAccountData(
+            //     address(this)
+            // );
+
+            // console.log("totalDebtBase:", totalDebtBase);
+            // console.log("ltv:", ltv);
+
+            // create the approval to aave pool
+            GHO.approve(address(aaveV3Pool), amountPlusInterest);
+
+            // Borrow GHO
+            repayAave(address(GHO), amountPlusInterest, 2, address(this));
+        }
 
         // state changes
-        if (amount == data.balance) {
+        if (amountPlusInterest == debt) {
             // If the payment is equal to the balance, the loan is repaid
             _data.state = LoanLibrary.LoanState.Repaid;
             // mark collateral as no longer escrowed
@@ -172,17 +212,7 @@ contract LoanCore is
                     )
                 )
             ] = false;
-            data = _data;
-        }
 
-        _data.interestAmountPaid += interest;
-        _data.balance -= amount;
-        _data.lastAccrualTimestamp = uint64(block.timestamp);
-
-        // collect principal and interest from borrower
-        GHO.safeTransferFrom(msg.sender, address(this), amount + interest);
-
-        if (loans[loanId].state == LoanLibrary.LoanState.Repaid) {
             // redistribute collateral and emit event
             IERC721(data.terms.collateralAddress).safeTransferFrom(
                 address(this),
@@ -192,6 +222,12 @@ contract LoanCore is
 
             emit LoanRepaid(loanId);
         }
+
+        _data.interestAmountPaid += interest;
+        _data.balance -= amountPlusInterest - interest;
+        _data.lastAccrualTimestamp = uint64(block.timestamp);
+
+        // handle repayment
 
         emit LoanPayment(loanId);
     }

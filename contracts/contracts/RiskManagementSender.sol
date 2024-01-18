@@ -25,13 +25,15 @@ contract RiskManagementSender {
     function supplySavvyCCIP(
         address receiver,
         uint256 amountOverCollateralized,
+        uint256 userBal,
         address recipient
     ) public {
         Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
             receiver: abi.encode(receiver),
             data: abi.encodeWithSignature(
-                "callSavvySupply(uint256, address)",
+                "callSavvySupply(uint256,uint256,address)",
                 amountOverCollateralized,
+                userBal,
                 recipient
             ),
             tokenAmounts: new Client.EVMTokenAmount[](0),
@@ -60,7 +62,7 @@ contract RiskManagementSender {
         Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
             receiver: abi.encode(receiver),
             data: abi.encodeWithSignature(
-                "callWithdrawSavvy(uint256, address)",
+                "callWithdrawSavvy(uint256,address)",
                 amountOverCollateralized,
                 recipient
             ),

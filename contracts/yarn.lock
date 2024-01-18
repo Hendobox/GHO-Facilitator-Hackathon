@@ -1368,6 +1368,11 @@
   "resolved" "https://registry.npmjs.org/bech32/-/bech32-1.1.4.tgz"
   "version" "1.1.4"
 
+"big.js@^6.2.1":
+  "integrity" "sha512-bCtHMwL9LeDIozFn+oNhhFoq+yQ3BNdnsLSASUxLciOb1vgvpHsIO1dsENiGMgbb4SkP5TrzWzRiLddn8ahVOQ=="
+  "resolved" "https://registry.npmjs.org/big.js/-/big.js-6.2.1.tgz"
+  "version" "6.2.1"
+
 "bigint-crypto-utils@^3.0.23":
   "integrity" "sha512-jOTSb+drvEDxEq6OuUybOAv/xxoh3cuYRUIPyu8sSHQNKM303UQ2R1DAo45o1AkcIXw6fzbaFI1+xGGdaXs2lg=="
   "resolved" "https://registry.npmjs.org/bigint-crypto-utils/-/bigint-crypto-utils-3.3.0.tgz"

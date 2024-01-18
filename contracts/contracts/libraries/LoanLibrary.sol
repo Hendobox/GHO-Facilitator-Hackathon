@@ -21,7 +21,6 @@ library LoanLibrary {
         address collateralAddress;
         uint256 collateralId;
         uint256 principal;
-        uint64 destinationChain;
         Facilitator facilitator;
     }
 
@@ -34,5 +33,6 @@ library LoanLibrary {
         uint256 interestAmountPaid;
         uint256 allowance; // current borrow allowance
         LoanTerms terms;
+        address owner;
     }
 }

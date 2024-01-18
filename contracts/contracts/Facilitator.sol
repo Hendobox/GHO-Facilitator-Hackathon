@@ -26,8 +26,34 @@ contract Facilitator {
         uint256 amount,
         address onBehalfOf
     ) internal {
-        // use interest rate as 1 for stable
-        aaveV3Pool.borrow(asset, amount, 1, 0, onBehalfOf);
+        // use interest rate as 2 for unstable
+        aaveV3Pool.borrow(asset, amount, 2, 0, onBehalfOf);
+    }
+
+    function repayAave(
+        address asset,
+        uint256 amount,
+        uint256 rateMode,
+        address onBehalfOf
+    ) internal {
+        aaveV3Pool.repay(asset, amount, rateMode, onBehalfOf);
+    }
+
+    function getUserAccountData(
+        address user
+    )
+        public
+        view
+        returns (
+            uint256 totalCollateralBase,
+            uint256 totalDebtBase,
+            uint256 availableBorrowsBase,
+            uint256 currentLiquidationThreshold,
+            uint256 ltv,
+            uint256 healthFactor
+        )
+    {
+        return aaveV3Pool.getUserAccountData(user);
     }
 
     function supplySavvyGHO(

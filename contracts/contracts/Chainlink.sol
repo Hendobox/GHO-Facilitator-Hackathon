@@ -19,6 +19,15 @@ contract Chainlink {
             /*uint timeStamp*/,
             /*uint80 answeredInRound*/
         ) = nftFloorPriceFeed.latestRoundData();
-        return nftFloorPrice;
+
+        // since chainlind does not currently support Sepolia network
+        // we are forced to use the aggregator address of Crypto Punk
+        // deployed on Goerli. The same address also is deployed on sepolia
+        // though it maps to a different market. we will just use it for
+        // demo purposes and estimate a desired value
+        // since we expect to convert to USDC which has 6 decimals, we multitply
+        // the value by 10 to take it close to 5000 USD in the case of USDC for demo purposes
+
+        return nftFloorPrice * 10;
     }
 }

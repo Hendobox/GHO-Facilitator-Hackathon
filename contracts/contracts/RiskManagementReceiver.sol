@@ -27,34 +27,59 @@ contract RiskManagementReceiver is Facilitator, CCIPReceiver {
     function _ccipReceive(
         Client.Any2EVMMessage memory message
     ) internal override {
-        (bytes4 functionSelector, uint256 amount, address recipient) = abi
-            .decode(message.data, (bytes4, uint256, address));
+        (
+            bytes4 functionSelector,
+            uint256 amountOverCollateralized,
+            uint256 userBal,
+            address recipient
+        ) = abi.decode(message.data, (bytes4, uint256, uint256, address));
 
         if (
             functionSelector ==
-            bytes4(keccak256("callSavvySupply(uint256,address)"))
+            bytes4(keccak256("callSavvySupply(uint256,uint256,address)"))
         ) {
             // Call the supplySavvy function with the decoded arguments
-            callSupplySavvy(amount, recipient);
+            callSupplySavvy(amountOverCollateralized, userBal, recipient);
         } else {
-            callWithdrawSavvy(amount, recipient);
+            callWithdrawSavvy(amountOverCollateralized, recipient);
         }
 
-        emit MessageReceived(message.messageId, amount, recipient);
+        emit MessageReceived(
+            message.messageId,
+            amountOverCollateralized + userBal,
+            recipient
+        );
     }
 
-    function callSupplySavvy(uint256 amount, address recipient) private {
+    function callSupplySavvy(
+        uint256 amountOverCollateralized,
+        uint256 userBal,
+        address recipient
+    ) private {
+        uint256 amount = amountOverCollateralized + userBal;
         // create the approval to savvy pool
         IERC20(gho).approve(address(savvyPool), amount);
 
         // supply GHO into Savvy
+        uint256 share = supplySavvyGHO(yieldToken, amount, recipient, 0);
+        _splitShare(amountOverCollateralized, userBal, share, recipient);
+    }
+
+    function _splitShare(
+        uint256 platformAmount,
+        uint256 userAmount,
+        uint256 share,
+        address recipeint
+    ) private {
+        uint256 platformShare = userAmount == 0
+            ? share
+            : (platformAmount * share) / (platformAmount + userAmount);
+
+        uint256 userShare = share - platformShare;
+
         unchecked {
-            shares[recipient] += supplySavvyGHO(
-                yieldToken,
-                amount,
-                recipient,
-                0
-            );
+            shares[address(this)] += platformShare;
+            if (userShare > 0) shares[recipeint] += userShare;
         }
     }
 
