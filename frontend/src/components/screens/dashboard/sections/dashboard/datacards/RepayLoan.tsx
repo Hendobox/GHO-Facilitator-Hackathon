@@ -1,3 +1,4 @@
+import { DropDownSelect } from "@/components/ui/dashboard/DropDownSelect"
 import { Input } from "@/components/ui/input"
 
 function NoActiveLoan() {
@@ -44,21 +45,8 @@ function ActiveLoan() {
                 >
                     <Input type="number" placeholder="Repay" className="rounded-l" />
 
-                    <div
-                        id="NavigationMenuItem"
-                        className="bg-[#3f3f46] flex flex-row items-center  pl-4 pr-4 w-max rounded-r"
-                    >
-                        <div
-                            className="h-full text-sm font-medium leading-[20px] text-white"
-                        >
-                            GHO
-                        </div>
-                        <img
-                            src="https://file.rendit.io/n/9aTLl3UQ4JolaLcdMKOj.svg"
-                            alt="Iconchevrondown"
-                            id="Iconchevrondown"
-                        />
-                    </div>
+                    <DropDownSelect values={["GHO", "ETH"]} onValueChange={(value) => console.log(value)} />
+
                 </div>
                 <button className="mt-4 bg-[#27272a] flex flex-row ml-[111px] w-8 h-8 items-start pt-2 px-2 rounded">
                     <img
