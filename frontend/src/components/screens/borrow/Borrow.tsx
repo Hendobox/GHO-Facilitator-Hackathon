@@ -5,6 +5,7 @@ import NavigationButtons from "../../ui/borrow/NavigationButtons"
 import DepositNFT from "./steps/depositNFT/DepositNFT"
 import { InterfaceNFT } from "./steps/depositNFT/columns"
 import LoanTerms from "./steps/loanTerms/LoanTerms"
+import GetApproval from "./steps/getApproval/GetApproval"
 
 export default function Borrow() {
     const [step, setStep] = useState(0)
@@ -35,6 +36,19 @@ export default function Borrow() {
                 return <DepositNFT setSelectedNFTs={setSelectedNFTs} />
             case 1:
                 return <LoanTerms />
+            case 2:
+                return <GetApproval
+                    selectedNFTs={selectedNFTs}
+                    receiverAddress="0xC0ffee254729296...AC7E10F9d54979"
+                    loanAmount={13000}
+                    interest={702}
+                    dueDate="03/28/2024"
+                    dueAmount={13702}
+                    buffer={6000}
+                    apy={204}
+                    stakingPeriod={45}
+                    interestSaved={2.1}
+                />
             default:
                 return null
         }
