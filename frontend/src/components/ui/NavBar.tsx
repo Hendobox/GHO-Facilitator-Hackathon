@@ -16,7 +16,10 @@ export default function NavBar() {
                     <Link to={"/borrow"}>Borrow</Link>
                 </li>
             </ul>
-            <ConnectKitButton />
+            <div className="flex flex-row justify-between items-center gap-4">
+                <Link to={"/dashboard"}>Dashboard</Link>
+                <ConnectKitButton />
+            </div>
         </nav>
     )
 }
