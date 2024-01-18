@@ -24,13 +24,13 @@ export function DropDownSelect({ values, placeholder, onValueChange, color, clas
 
     return (
         <Select defaultValue={values[0]} onValueChange={handleChange}>
-            <SelectTrigger style={{ backgroundColor: color ?? '#3F3F46' }} className={className ?? "w-[140px]"}>
+            <SelectTrigger style={{ backgroundColor: color ?? '#3F3F46' }} className={className ?? "h-full border-none bg-zinc-700 w-[140px]"}>
                 <SelectValue placeholder={placeholder || values[0]} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-zinc-700 text-white border-none">
                 <SelectGroup >
                     {values.map((value, index) => (
-                        <SelectItem key={index} value={value}>{value}</SelectItem>
+                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" key={index} value={value}>{value}</SelectItem>
                     ))}
                 </SelectGroup>
             </SelectContent>
