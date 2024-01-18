@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
-library ChainlinkLib {
+contract Chainlink {
     AggregatorV3Interface internal constant nftFloorPriceFeed =
         AggregatorV3Interface(0x5c13b249846540F81c093Bc342b5d963a7518145);
 

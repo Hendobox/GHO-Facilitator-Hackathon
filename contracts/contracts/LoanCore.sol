@@ -10,11 +10,13 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./Whitelister.sol";
 import "./RiskManagementSender.sol";
 import "./interfaces/ILoanCore.sol";
-import "./libraries/ChainlinkLib.sol";
-import "./libraries/FacilitatorLib.sol";
+import "./Chainlink.sol";
+import "./Facilitator.sol";
 
 contract LoanCore is
     RiskManagementSender,
+    Chainlink,
+    Facilitator,
     Whitelister,
     ILoanCore,
     Pausable,
@@ -79,7 +81,7 @@ contract LoanCore is
         );
         if (collateralInUse[collateralKey]) revert Collateral_In_Use();
 
-        uint256 floorPriceUSD = uint256(ChainlinkLib.getLatestPrice());
+        uint256 floorPriceUSD = uint256(getLatestPrice());
         uint256 maxBorrowable = calculateCollateralValue(floorPriceUSD);
 
         if (terms.principal > maxBorrowable)
@@ -115,21 +117,13 @@ contract LoanCore is
             // handleNative();
         } else {
             // create the approval to aave pool
-            USDC.approve(address(FacilitatorLib.aaveV3Pool), terms.principal);
+            USDC.approve(address(aaveV3Pool), terms.principal);
 
             // supply the asset to Aave
-            FacilitatorLib.supplyAaveUSDC(
-                address(USDC),
-                maxBorrowable,
-                address(this)
-            );
+            supplyAaveUSDC(address(USDC), maxBorrowable, address(this));
 
             // Borrow GHO
-            FacilitatorLib.borrowAaveGHO(
-                address(GHO),
-                maxBorrowable,
-                address(this)
-            );
+            borrowAaveGHO(address(GHO), maxBorrowable, address(this));
         }
 
         // send GHO to the borrower (borrowTo)
@@ -209,7 +203,7 @@ contract LoanCore is
         // Ensure valid initial loan state when claiming loan
         if (data.state != LoanLibrary.LoanState.Active) revert Invalid_State();
 
-        uint256 floorPriceUSD = uint256(ChainlinkLib.getLatestPrice());
+        uint256 floorPriceUSD = uint256(getLatestPrice());
         uint256 maxBorrowable = calculateCollateralValue(floorPriceUSD);
 
         if (maxBorrowable > data.balance) revert Not_Unhealthy();

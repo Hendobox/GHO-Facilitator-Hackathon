@@ -4,14 +4,14 @@ pragma solidity 0.8.21;
 import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {FacilitatorLib} from "./libraries/FacilitatorLib.sol";
+import {Facilitator} from "./Facilitator.sol";
 
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
-contract RiskManagementReceiver is CCIPReceiver {
+contract RiskManagementReceiver is Facilitator, CCIPReceiver {
     mapping(address => uint256) public shares;
     address public gho;
     address public yieldToken;
@@ -45,11 +45,11 @@ contract RiskManagementReceiver is CCIPReceiver {
 
     function callSupplySavvy(uint256 amount, address recipient) private {
         // create the approval to savvy pool
-        IERC20(gho).approve(address(FacilitatorLib.savvyPool), amount);
+        IERC20(gho).approve(address(savvyPool), amount);
 
         // supply GHO into Savvy
         unchecked {
-            shares[recipient] += FacilitatorLib.supplySavvyGHO(
+            shares[recipient] += supplySavvyGHO(
                 yieldToken,
                 amount,
                 recipient,
@@ -62,12 +62,7 @@ contract RiskManagementReceiver is CCIPReceiver {
         uint256 share = shares[recipient];
 
         if (share > 0) {
-            FacilitatorLib.withdrawSavvyGHO(
-                address(this),
-                address(this),
-                amount,
-                recipient
-            );
+            withdrawSavvyGHO(address(this), address(this), amount, recipient);
         }
     }
 }
