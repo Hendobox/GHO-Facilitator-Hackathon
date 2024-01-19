@@ -58,7 +58,7 @@ export default function NavBar() {
                                 setOpen(true);
                             }}
                         >
-                            Lauch
+                            Launch App
                         </motion.button>
                     </div>
                     :

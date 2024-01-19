@@ -2,12 +2,12 @@ import "@fontsource/inter";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit"
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { arbitrum, mainnet, optimism, polygon, polygonMumbai, sepolia } from "viem/chains"
+import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "viem/chains"
 import { WagmiConfig, createConfig } from "wagmi"
 import App from './App.tsx'
 import './index.css'
 
-const chains = [polygonMumbai, sepolia, mainnet, polygon, optimism, arbitrum];
+const chains = [sepolia, arbitrumSepolia, mainnet, arbitrum];
 
 const config = createConfig(
     getDefaultConfig({
@@ -17,7 +17,7 @@ const config = createConfig(
         chains: chains,
 
         // Required
-        appName: "LFGHO",
+        appName: "Flare LFGHO",
 
         // Optional
         appDescription: "Borrow GHO with your NFTs",
