@@ -13,7 +13,7 @@ export default function PortfolioSection() {
         marginTop: '40px',
         display: 'flex',
         flexDirection: 'column',
-
+        width: "90%"
     }
 
     const headerStyle: CSSProperties = {
@@ -39,13 +39,8 @@ export default function PortfolioSection() {
     const availableHeaderBody: CSSProperties = {
         display: 'flex',
         flexDirection: 'row',
-        width: "263px",
-        height: "28px",
-        top: "260px",
-        left: "1057px",
-        gap: "8px",
-        marginLeft: "740px",
-        alignItems: 'center'
+        marginRight: "36px",
+        justifyContent: "flex-end"
     }
 
     const availableText: CSSProperties = {
@@ -78,8 +73,10 @@ export default function PortfolioSection() {
             </div>
 
             <div style={availableHeaderBody}>
-                <div style={availableText} >Available</div>
-                <div style={ghoText}>{ghoBalance.toLocaleString('en-IN')} GHO</div>
+                <div>
+                    <div style={availableText} >Available</div>
+                    <div style={ghoText}>{ghoBalance.toLocaleString('en-IN')} GHO</div>
+                </div>
             </div>
 
             <div className="m-10" >
