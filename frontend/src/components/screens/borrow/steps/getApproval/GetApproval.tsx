@@ -23,7 +23,6 @@ interface LoanSummaryProps {
 }
 
 const LoanSummary: React.FC<LoanSummaryProps> = ({
-    chosenProduct,
     selectedNFTs,
     receiverAddress,
     loanAmount,
