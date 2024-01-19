@@ -7,13 +7,13 @@ import WithdrawAccordionCard from "./accordioncards/WithDrawAccordionCard";
 
 export default function PortfolioSection() {
 
-    const gho = "17 02";
+    const ghoBalance: number = 1702;
 
     const layout: CSSProperties = {
         marginTop: '40px',
         display: 'flex',
         flexDirection: 'column',
-        width: '100%'
+
     }
 
     const headerStyle: CSSProperties = {
@@ -44,7 +44,7 @@ export default function PortfolioSection() {
         top: "260px",
         left: "1057px",
         gap: "8px",
-        marginLeft: "940px",
+        marginLeft: "740px",
         alignItems: 'center'
     }
 
@@ -79,7 +79,7 @@ export default function PortfolioSection() {
 
             <div style={availableHeaderBody}>
                 <div style={availableText} >Available</div>
-                <div style={ghoText}>{gho} GHO</div>
+                <div style={ghoText}>{ghoBalance.toLocaleString('en-IN')} GHO</div>
             </div>
 
             <div className="m-10" >

@@ -2,11 +2,13 @@
 
 import Card from "@/components/ui/dashboard/Card";
 import { CSSProperties } from "react";
-import LoanSummary from "./datacards/LoanSummary";
-import WalletBalance from "./datacards/WalletBalance";
-import CollateralValue from "./datacards/CollateralValue";
+import TotalStaked from "./datacards/TotalStaked";
+import Earnings from "./datacards/Earnings";
+import LoanAmount from "./datacards/LoanAmount";
 import AvailableBuffer from "./datacards/AvailableBuffer";
-import RepayLoan from "./datacards/RepayLoan";
+import StakeBuffer from "./actioncards/StakeBuffer";
+import RepayKeepStake from "./actioncards/RepayKeepStake";
+import RepayUnstake from "./actioncards/RepayUnstake";
 
 export default function DashboardSection() {
 
@@ -17,16 +19,6 @@ export default function DashboardSection() {
         width: '100%'
     }
 
-    const dashContent: CSSProperties = {
-        display: 'flex', // 862 404 236
-        flexDirection: 'row',
-        height: '66%'
-    }
-
-    const firstHalfDashContent: CSSProperties = {
-        marginRight: '24px',
-        width: '56%'
-    }
 
     const headerStyle: CSSProperties = {
         fontFamily: "Inter",
@@ -38,45 +30,60 @@ export default function DashboardSection() {
         marginBottom: "32px"
     }
 
-    const secondHalfDashContent: CSSProperties = {
-        width: '42%'
-    }
-
-    const txnContent: CSSProperties = {
-    }
     return (
         <div style={layout}>
-            <div style={dashContent}>
-                <div style={firstHalfDashContent}>
-                    <div style={headerStyle}>
-                        Dashboard
-                    </div>
-                    <div className="flex flex-row mb-3" >
-                        <Card height="188px" width="331px">
-                            <LoanSummary data={{}} />
-                        </Card>
-                        <div className="w-3" />
-                        <Card height="188px" width="331px">
-                            <WalletBalance />
-                        </Card>
-                    </div>
-                    <div className="flex flex-row">
-                        <Card height="188px" width="331px">
-                            <CollateralValue data={{}} />
-                        </Card>
-                        <div className="w-3" />
-                        <Card height="188px" width="331px" >
-                            <AvailableBuffer data={{}} />
-                        </Card>
-                    </div>
+            <div >
+                <div style={headerStyle}>
+                    Dashboard
                 </div>
-                <div style={secondHalfDashContent}>
-                    <Card height="457px" width="331px">
-                        <RepayLoan data={{}} />
+
+                {/* Data Cards */}
+                <div className="flex flex-row mb-10 " >
+                    <Card color="#6D28D9" height="108px" width="227px">
+                        <TotalStaked />
+                    </Card>
+
+                    <div className="w-4" />
+
+                    <Card color="#6D28D9" height="108px" width="227px">
+                        <Earnings />
+                    </Card>
+
+                    <div className="w-4" />
+
+                    <Card color="#6D28D9" height="108px" width="227px">
+                        <LoanAmount />
+                    </Card>
+
+                    <div className="w-4" />
+
+                    <Card color="#6D28D9" height="108px" width="227px" >
+                        <AvailableBuffer />
                     </Card>
                 </div>
+
+                {/* Action Cards */}
+                <div className="flex flex-row mb-10 " >
+                    <Card height="304px" width="308px" >
+                        <StakeBuffer />
+                    </Card>
+
+                    <div className="w-4" />
+
+                    <Card height="304px" width="308px" >
+                        <RepayKeepStake />
+                    </Card>
+
+                    <div className="w-4" />
+
+                    <Card height="304px" width="308px" >
+                        <RepayUnstake />
+                    </Card>
+
+                </div>
             </div>
-            <div style={txnContent}>
+
+            <div className="">
                 <div> Transactions </div>
             </div>
         </div>

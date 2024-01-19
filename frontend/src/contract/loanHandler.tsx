@@ -5,11 +5,11 @@ import LoanCoreArtifact from './abi/LoanCore.json';
 const LoanCoreABI = LoanCoreArtifact.abi;
 
 interface LoanTerms {
-    collateralAddress: string;
-    collateralId: bigint;
-    principal: bigint;
-    destinationChainCCIP: number,
-    facilitator: number;
+    collateralAddress: string; // crypto punk address
+    collateralId: bigint; // dummy token id of nft
+    principal: bigint; // input borrowing amount, max borrowable buttn pull data from contract fn
+    destinationChainCCIP: number, // arbitrum chain
+    facilitator: number; // aave or our facilitator input
 }
 
 interface RepayTerms {
