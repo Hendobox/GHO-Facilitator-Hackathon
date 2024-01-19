@@ -9,7 +9,7 @@ export default function DashboardLayout() {
     const [selectedItem, setSelectedItem] = useState<DashboardSections>(DashboardSections.Dashboard);
 
     return (
-        <div className="h-[calc(90vh-105px) max-w-[1200px] mx-auto flex flex-row text-white px-28 border-t-[1px] border-[#3F3F46]">
+        <div className="h-[calc(90vh-105px) flex flex-row text-white px-28 border-t-[1px] border-[#3F3F46]">
 
             <DashboardSelector
                 selectedItem={selectedItem}

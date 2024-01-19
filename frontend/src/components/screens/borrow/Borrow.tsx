@@ -8,9 +8,12 @@ import LoanTerms from "./steps/loanTerms/LoanTerms"
 import GetApproval from "./steps/getApproval/GetApproval"
 import ChooseProduct from "./steps/chooseProduct/ChooseProduct"
 
+export type ProductType = "stake" | "borrow" | "stake_borrow"
+
 export default function Borrow() {
     const [step, setStep] = useState(0)
     const [selectedNFTs, setSelectedNFTs] = useState<InterfaceNFT[]>([])
+    const [productType, setProductType] = useState<ProductType>("stake")
 
     const handleNextStep = () => {
         if (step === 0 && selectedNFTs.length === 0) {
@@ -36,7 +39,10 @@ export default function Borrow() {
             case 0:
                 return <DepositNFT setSelectedNFTs={setSelectedNFTs} />
             case 1:
-                return <ChooseProduct />
+                return <ChooseProduct chosenProduct={productType} onChooseProduct={(product: ProductType) => {
+                    setProductType(product)
+                    handleNextStep()
+                }} />
             case 2:
                 return <LoanTerms />
             case 3:
@@ -58,12 +64,12 @@ export default function Borrow() {
     }
 
     return (
-        <div className="h-[calc(85vh-105px)] max-w-[1200px] mx-auto w-full flex flex-col justify-between text-white px-28 border-t-[1px] border-[#3F3F46]">
+        <div className="h-[calc(85vh-105px)] flex flex-col justify-between text-white px-28 border-t-[1px] border-[#3F3F46]">
             <div>
                 <BorrowHeader step={step} />
                 {renderScreen()}
             </div>
-            <NavigationButtons handlePreviousStep={handlePreviousStep} handleNextStep={handleNextStep} />
+            {step !== 1 && <NavigationButtons handlePreviousStep={handlePreviousStep} handleNextStep={handleNextStep} />}
         </div>
     )
 }
