@@ -5,9 +5,11 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion"
 import { InterfaceNFT } from "../depositNFT/columns";
+import { ProductType } from "../../Borrow";
 
 
 interface LoanSummaryProps {
+    chosenProduct: ProductType;
     selectedNFTs: InterfaceNFT[];
     receiverAddress: string;
     loanAmount: number;
@@ -21,6 +23,7 @@ interface LoanSummaryProps {
 }
 
 const LoanSummary: React.FC<LoanSummaryProps> = ({
+    chosenProduct,
     selectedNFTs,
     receiverAddress,
     loanAmount,

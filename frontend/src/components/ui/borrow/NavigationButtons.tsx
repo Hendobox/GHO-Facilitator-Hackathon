@@ -3,9 +3,11 @@ import { motion } from 'framer-motion';
 export default function NavigationButtons({
     handleNextStep,
     handlePreviousStep,
+    noNextButton
 }: {
     handleNextStep: () => void;
     handlePreviousStep: () => void;
+    noNextButton?: boolean;
 }) {
     return (
         <div className="flex flex-row justify-between pt-8 items-start text-white">
@@ -20,14 +22,14 @@ export default function NavigationButtons({
                 </svg>
                 <span>Go back</span>
             </motion.button>
-            <motion.button
+            {!noNextButton && <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleNextStep}
                 className="bg-violet-700 rounded-md py-2 px-4"
             >
                 Continue
-            </motion.button>
+            </motion.button>}
         </div>
     );
 }

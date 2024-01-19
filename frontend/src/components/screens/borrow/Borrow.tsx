@@ -44,9 +44,10 @@ export default function Borrow() {
                     handleNextStep()
                 }} />
             case 2:
-                return <LoanTerms />
+                return <LoanTerms chosenProduct={productType} setProductType={setProductType} />
             case 3:
                 return <GetApproval
+                    chosenProduct={productType}
                     selectedNFTs={selectedNFTs}
                     receiverAddress="0xC0ffee254729296...AC7E10F9d54979"
                     loanAmount={13000}
@@ -64,12 +65,12 @@ export default function Borrow() {
     }
 
     return (
-        <div className="h-[calc(85vh-105px)] flex flex-col justify-between text-white px-28 border-t-[1px] border-[#3F3F46]">
+        <div className="h-[calc(85vh-105px)] flex flex-col justify-start text-white px-28 border-t-[1px] border-[#3F3F46]">
             <div>
-                <BorrowHeader step={step} />
+                <BorrowHeader step={step} productType={productType} />
                 {renderScreen()}
             </div>
-            {step !== 1 && <NavigationButtons handlePreviousStep={handlePreviousStep} handleNextStep={handleNextStep} />}
+            <NavigationButtons handlePreviousStep={handlePreviousStep} handleNextStep={handleNextStep} noNextButton={step === 1} />
         </div>
     )
 }

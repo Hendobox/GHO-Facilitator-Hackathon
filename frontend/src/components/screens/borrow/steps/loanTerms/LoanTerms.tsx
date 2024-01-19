@@ -1,21 +1,45 @@
 import CustomInput, { Icon } from "@/components/ui/CustomInput";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { useToast } from "@/components/ui/use-toast";
 import { useEffect, useState } from 'react';
-import { useToast } from "@/components/ui/use-toast"
+import { ProductType } from "../../Borrow";
+import { Switch } from "@/components/ui/switch";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 type NetworkType = 'ETH' | 'BSC';
+const Durations: Record<string, string> = {
+    "7": "1 week",
+    "14": "2 weeks",
+    "30": "1 month",
+    "60": "2 months",
+    "90": "3 months",
+    "180": "6 months",
+    "365": "1 year",
+    "730": "2 years",
+    "1095": "3 years",
+}
 
-const LoanTerms = () => {
+const LoanTerms = ({
+    chosenProduct,
+    setProductType
+}: {
+    chosenProduct: ProductType,
+    setProductType: (product: ProductType) => void
+}) => {
     const [amount, setAmount] = useState<string>('');
     const [address, setAddress] = useState<string>('');
-    const [checked, setChecked] = useState<boolean>(false);
+    const [duration, setDuration] = useState<string>('');
     const [network, setNetwork] = useState<NetworkType>('ETH');
-    const [interestRate, setInterestRate] = useState<number>();
+    const [interestRate, setInterestRate] = useState<number>(0);
+    // use toast when rate updates
     const { toast } = useToast();
+    const loanAmount = +amount;
+    const interest = interestRate;
+    const dueDate = "03/28/2024";
+    const dueAmount = loanAmount + interest;
+    const interestPct = `${(interest / loanAmount) * 100}%`;
+    const apy = 204;
 
     const maxAmount = 1000;
     console.log("🚀 ~ LoanTerms ~ network:", network)
@@ -27,117 +51,149 @@ const LoanTerms = () => {
     }, [amount]);
 
     return (
-        <div className="flex flex-col gap-10">
-            <div>
-                <span>Borrowing terms</span>
-                <div className="mt-5 flex flex-row justify-between gap-6">
+        <div className="flex flex-row justify-between gap-10">
+            <div className="flex flex-col w-1/2 gap-10">
+                <div className="flex flex-row justify-between items-center">
+                    <span>Enter {chosenProduct === "borrow" ? "loan" : "stake"} details</span>
+                    {chosenProduct !== "stake" && (
+                        <div className="flex items-center gap-2">
+                            <span>Stake buffer</span>
+                            <Icon icon="document" />
+                            <Switch
+                                checked={chosenProduct === "stake_borrow"}
+                                onCheckedChange={(value) => {
+                                    setProductType(value ? "stake_borrow" : "borrow");
+                                }}
+                            />
+                        </div>
+                    )}
+                </div>
+                {chosenProduct !== "stake" &&
+                    <div className="flex flex-row justify-between gap-6">
+                        <CustomInput
+                            label="Loan amount in GHO"
+                            value={amount}
+                            onChange={setAmount}
+                            placeholder="0.0"
+                            subtext="Amount cannot exceed xx.yy GHO"
+                            icon="document"
+                            actionElement={
+                                <Button
+                                    variant="simple"
+                                    className="h-full text-[#D97706]"
+                                    onClick={() => setAmount(`${maxAmount}`)}
+                                >
+                                    MAX
+                                </Button>
+                            }
+                        />
+                        <CustomInput
+                            label="Enter loan receiver address"
+                            value={address}
+                            onChange={setAddress}
+                            placeholder="Address"
+                            icon="document"
+                            actionElement={
+                                <Select
+                                    onValueChange={(e: NetworkType) => {
+                                        setNetwork(e);
+                                    }}
+                                >
+                                    <SelectTrigger className="h-full border-none bg-zinc-700">
+                                        <SelectValue placeholder="Network" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-zinc-700 text-white border-none">
+                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="ETH">ETH</SelectItem>
+                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="BSC">BSC</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                            }
+                        />
+                    </div>
+                }
+                {chosenProduct !== "borrow" &&
                     <CustomInput
-                        label="Enter an amount in GHO"
-                        value={amount}
-                        onChange={setAmount}
-                        placeholder="0.0"
-                        subtext="Amount cannot exceed xx.yy GHO"
-                        icon="document"
-                        actionElement={
-                            <Button
-                                variant="simple"
-                                className="h-full text-[#D97706]"
-                                onClick={() => setAmount(`${maxAmount}`)}
-                            >
-                                MAX
-                            </Button>
-                        }
-                    />
-                    <CustomInput
-                        label="Enter loan receiver address"
-                        value={address}
-                        onChange={setAddress}
-                        placeholder="Address"
+                        label={chosenProduct === "stake" ? "Staking duration" : "Buffer stake"}
+                        value={duration}
+                        onChange={setDuration}
+                        placeholder="365 (days)"
                         icon="document"
                         actionElement={
                             <Select
-                                onValueChange={(e: NetworkType) => {
-                                    setNetwork(e);
+                                onValueChange={(e: string) => {
+                                    setDuration(e);
+                                    toast({
+                                        title: "Interest rate updated",
+                                        description: `Interest rate updated to ${interestRate}%`,
+                                    });
                                 }}
                             >
                                 <SelectTrigger className="h-full border-none bg-zinc-700">
-                                    <SelectValue placeholder="Network" />
+                                    <SelectValue placeholder="Duration" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-zinc-700 text-white border-none">
-                                    <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="ETH">ETH</SelectItem>
-                                    <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="BSC">BSC</SelectItem>
+                                    {Object.keys(Durations).map((key) => (
+                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value={key}>{Durations[key]}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
 
                         }
                     />
-                    <CustomInput
-                        label="Interest rate"
-                        value={interestRate ? `${interestRate.toFixed(2)}%` : ''}
-                        readOnly
-                        placeholder="Enter amount to see rate"
-                        icon="document"
-                    />
-                </div>
+                }
             </div>
-            <div>
-                <div className="flex flex-row justify-between items-center">
-                    <div className="flex flex-row items-center gap-2">
-                        <span>Select facilitator</span>
-                        <Icon icon="document" />
-                    </div>
-                    <div className="flex flex-row items-center gap-2">
-                        <motion.span
-                            initial={{ opacity: checked ? 1 : 0.5 }}
-                            animate={{ opacity: checked ? 0.5 : 1, scale: checked ? 0.95 : 1.05 }}
-                            transition={{ duration: 0.3, type: "spring" }}
-                        >
-                            Lenders
-                        </motion.span>
-                        <Switch
-                            checked={checked}
-                            onCheckedChange={(value) => {
-                                console.log("🚀 ~ LoanTerms ~ value:", value)
-                                setChecked(value);
-                                toast({
-                                    title: "Interest rate changed!",
-                                    description: `New interest rates apply by changing to the ${value ? 'AaveV3' : 'Lenders'} facilitator.`,
-                                    variant: "ghost"
-                                });
-                            }
-                            }
-                        />
-                        <motion.span
-                            initial={{ opacity: checked ? 0.5 : 1 }}
-                            animate={{ opacity: checked ? 1 : 0.5, scale: checked ? 1.05 : 0.95 }}
-
-                            transition={{ duration: 0.3, type: "spring" }}
-                        >
-                            AaveV3
-                        </motion.span>
-                    </div>
-                </div>
-                <div className="mt-5 flex flex-row justify-between gap-6">
-                    <div
-                        className={cn("w-1/2 p-6 text-zinc-400 bg-zinc-800 flex flex-col gap-2 rounded-[8px] border-2 border-transparent", { "border-violet-700": !checked })}
-                    >
-                        <span className="text-sm text-white">Lender</span>
-                        <span>
-                            Stake your collateral buffer on Savvy Defi and earn interest, enhancing your overall returns
-                        </span>
-                        <span>
-                            Leverage the power of your staked collateral buffer to enjoy reduced interest rates on your loan, maximizing your cost savings.
-                        </span>
-                    </div>
-                    <div
-                        className={cn("w-1/2 p-6 text-zinc-400 bg-zinc-800 flex flex-col gap-2 rounded-[8px] border-2 border-transparent", { "border-violet-700": checked })}
-                    >
-                        <span className="text-sm text-white">AaveV3</span>
-                        <span>
-                            Utilize the Aave facilitator to borrow without staking your collateral buffer. Enjoy the flexibility of withdrawing the remainder at any time, providing you with instant access to the full value of your collateral.
-                        </span>
-                    </div>
-                </div>
+            <div className="flex flex-col gap-2 w-1/2">
+                {chosenProduct !== "stake" &&
+                    <Accordion defaultValue="item-1" type="single" className="px-6 border-[1px] rounded-[8px] border-zinc-700">
+                        <AccordionItem value="item-1">
+                            <AccordionTrigger>Loan Information</AccordionTrigger>
+                            <AccordionContent>
+                                <div className="flex flex-row justify-between mt-2">
+                                    <div className="flex flex-col justify-between gap-2">
+                                        <span className="text-sm text-zinc-400">Loan amount</span>
+                                        <span>{loanAmount} GHO</span>
+                                    </div>
+                                    <div className="flex flex-col justify-between gap-2">
+                                        <span className="text-sm text-zinc-400">Interest {interestPct}</span>
+                                        <span>{interest} GHO</span>
+                                    </div>
+                                    <div className="flex flex-col justify-between gap-2">
+                                        <span className="text-sm text-zinc-400">Due date</span>
+                                        <span>{dueDate}</span>
+                                    </div>
+                                    <div className="flex flex-col justify-between gap-2">
+                                        <span className="text-sm text-zinc-400">Due amount</span>
+                                        <span>{dueAmount} GHO</span>
+                                    </div>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                }
+                {chosenProduct !== "borrow" &&
+                    <Accordion defaultValue="item-2" type="single" className="px-6 border-[1px] rounded-[8px] border-zinc-700">
+                        <AccordionItem value="item-2">
+                            <AccordionTrigger>Stake Information</AccordionTrigger>
+                            <AccordionContent>
+                                <div className="flex flex-row justify-between mt-2">
+                                    <div className="flex flex-col justify-between gap-2">
+                                        <span className="text-sm text-zinc-400">Duration</span>
+                                        <span>{duration} days</span>
+                                    </div>
+                                    <div className="flex flex-col justify-between gap-2">
+                                        <span className="text-sm text-zinc-400">APY (3.4%)</span>
+                                        <span>{apy} GHO</span>
+                                    </div>
+                                    <div className="flex flex-col justify-between gap-2">
+                                        <span className="text-sm text-zinc-400">Total earnings</span>
+                                        <span>324,342 GHO</span>
+                                    </div>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                }
             </div>
         </div >
     );

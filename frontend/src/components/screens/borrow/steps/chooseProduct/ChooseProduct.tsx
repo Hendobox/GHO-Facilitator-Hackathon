@@ -1,33 +1,7 @@
 import { cn } from "@/lib/utils"
 import { ProductType } from "../../Borrow"
 import { motion } from "framer-motion"
-
-const products: {
-    name: string,
-    description: string,
-    type: ProductType,
-    points: string[]
-}[]
-    = [
-        {
-            name: "Stake",
-            description: "For active earners, investors and liquidity providers.",
-            type: "stake",
-            points: ["Receive yields on the total value of your asset", "No loan takeouts. No interest issues"]
-        },
-        {
-            name: "Borrow",
-            description: "For active earners, investors and liquidity providers.",
-            type: "borrow",
-            points: ["Receive yields on the total value of your asset", "Access interest-based loans on your asset. Take out anyhow you want"]
-        },
-        {
-            name: "Stake & Borrow",
-            description: "For active earners, investors and liquidity providers.",
-            type: "stake_borrow",
-            points: ["Low interest rate, when you stake your collateral buffer", "Earn yields for as long as your asset is locked with us"]
-        }
-    ]
+import { products } from "./products"
 
 export default function ChooseProduct({
     chosenProduct,
@@ -36,8 +10,6 @@ export default function ChooseProduct({
     chosenProduct: ProductType
     onChooseProduct: (product: ProductType) => void
 }) {
-
-
     return (
         <div className="flex flex-row justify-between gap-6">
             {products.map((product, index) => (
