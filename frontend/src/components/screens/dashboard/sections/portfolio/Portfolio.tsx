@@ -1,13 +1,13 @@
 
 
 import { AccordionCard } from "@/components/ui/dashboard/AccordionCard";
-import { CSSProperties } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import StakeAccordionCard from "./accordioncards/StakeAccordionCard";
 import WithdrawAccordionCard from "./accordioncards/WithDrawAccordionCard";
+import { useAccount } from "wagmi";
+import { getGhoBalance } from "@/contract/loanHandler"
 
 export default function PortfolioSection() {
-
-    const ghoBalance: number = 1702;
 
     const layout: CSSProperties = {
         marginTop: '40px',
@@ -61,6 +61,20 @@ export default function PortfolioSection() {
         letterSpacing: "-0.005em",
         textAlign: "right",
     }
+
+    const account = useAccount()
+    const [ghoBalance, setBalance] = useState(0.0)
+    useEffect(() => {
+        if (account) {
+            (async () => {
+                const ghoBalance = await getGhoBalance(account)
+                setBalance(
+                    parseFloat(parseFloat((BigInt(ghoBalance) / BigInt(10 ** 18)).toString())
+                        .toFixed(2))
+                )
+            })()
+        }
+    })
 
     return (
         <div style={layout}>

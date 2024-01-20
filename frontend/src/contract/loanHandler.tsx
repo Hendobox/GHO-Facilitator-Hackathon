@@ -213,4 +213,27 @@ async function repayDebt(
     return hash
 }
 
-export { startLoan, repayDebt, getLoans, calculateInterestRate };
+async function getGhoBalance(account: any) {
+    const client: WalletClient = await account.connector?.getWalletClient()
+
+    const ghoTokenAddress = await publicActions(client).readContract({
+        address: unHODLContractAddress,
+        abi: LoanCoreABI,
+        functionName: 'GHO',
+        account: client.account.address,
+    }) as `0x${string}`;
+
+    const balance = await publicActions(client).readContract({
+        address: ghoTokenAddress,
+        abi: GhoTokenABI,
+        functionName: 'balanceOf',
+        account: client.account.address,
+        args: [
+            client.account.address
+        ]
+    }) as bigint;
+
+    return balance
+}
+
+export { getGhoBalance, startLoan, repayDebt, getLoans, calculateInterestRate };
