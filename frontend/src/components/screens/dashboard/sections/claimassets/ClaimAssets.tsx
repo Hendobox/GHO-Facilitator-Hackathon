@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import LoanRepaymentSection from "./LoanRepayment";
 import { motion } from 'framer-motion';
+import { useAccount } from "wagmi";
+import { getStakeNFTsUser } from '@/contract/nftApi'
 
 interface ClaimAssetsProps {
     loanRepayment?: boolean
@@ -41,6 +43,14 @@ export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) 
 
     const assetsTable: CSSProperties = {
     }
+
+    const account = useAccount()
+
+    useEffect(() => {
+        if (account) {
+            getStakeNFTsUser(account)
+        }
+    })
     return (
         <>
             {loanRepay ?

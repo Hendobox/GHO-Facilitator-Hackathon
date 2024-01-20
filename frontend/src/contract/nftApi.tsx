@@ -1,5 +1,6 @@
 import { PublicClient } from "wagmi";
 import { GetAccountResult } from "wagmi/actions";
+import { getLoans } from "./loanHandler";
 
 interface NftData {
     tokenId: number,
@@ -61,4 +62,67 @@ async function fetchNFTsUser(account: GetAccountResult<PublicClient>) {
     return nftData;
 }
 
-export { fetchNFTsUser };
+async function fetchNFTMetadata(contractAddress: `0x${string}`, tokenId: bigint) {
+
+    const options = { method: 'GET', headers: { accept: 'application/json' } }
+    const apiKey = import.meta.env.VITE_ALCHEMY_ID
+
+    const data = await fetch(`https://eth-sepolia.g.alchemy.com/nft/v3/${apiKey}/getNFTMetadata?contractAddress=${contractAddress}&tokenId=${tokenId}&refreshCache=fals`, options)
+
+    const json = await data.json()
+    const nfts = json.ownedNfts
+
+    const nftData: NftData = nfts.map((nft: {
+        tokenId: string,
+        balance: string,
+        tokenUri: string,
+        image: { cachedUrl: string },
+        tokenType: string,
+        contract: { address: string, name: string },
+        description: string
+    }) => ({
+        tokenId: parseInt(nft.tokenId),
+        balance: parseInt(nft.balance),
+        tokenUri: nft.tokenUri,
+        imageUrl: nft.image.cachedUrl,
+        tokenType: nft.tokenType,
+        contractAddress: nft.contract.address,
+        name: nft.contract.name,
+        description: nft.description,
+        price: parseFloat((5398000000 / (10 ** 6)).toString()),
+    })
+    );
+
+    return nftData;
+}
+
+async function getStakeNFTsUser(account: any) {
+    const loansData = await getLoans(account);
+
+    const nftsData: NftData[] = [];
+
+    for (let index = 0; index < loansData.length; index++) {
+        const loan = loansData[index];
+        const nftData = await fetchNFTMetadata(loan.terms.collateralAddress as `0x${string}`, loan.terms.collateralId);
+
+        const mappedNftData: NftData = {
+            tokenId: nftData.tokenId,
+            balance: Number(loan.balance), // here balance of loan in GHO
+            tokenUri: nftData.tokenUri,
+            imageUrl: nftData.imageUrl,
+            tokenType: nftData.tokenType,
+            contractAddress: nftData.contractAddress,
+            name: nftData.name, // use this name in ui
+            description: nftData.description,
+            price: loan.entryPrice.toString(),
+        };
+
+        nftsData.push(mappedNftData);
+    }
+
+    return nftsData;
+}
+
+
+
+export { fetchNFTsUser, fetchNFTMetadata, getStakeNFTsUser };

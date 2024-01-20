@@ -146,8 +146,8 @@ async function getLoans(account: any): Promise<LoanData[]> {
             owner: "0x8c427C56790f2C36664870a55B3A0189bFf9996d",
             state: 0,
             terms: {
-                collateralAddress: "",
-                collateralId: 1n,
+                collateralAddress: "0x86ef4d0470dA8A06F21795055a6b8Bf9BA262059",
+                collateralId: 0n,
                 principal: 1000n,
                 facilitator: 0
             },
