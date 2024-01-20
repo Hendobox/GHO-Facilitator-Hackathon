@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 
 export type InterfaceNFT = {
     tokenId?: number,
-    balance?: number,
+    balance?: bigint,
     tokenUri?: string, //ipfs
     imageUrl: string, // https
     tokenType?: string,
@@ -13,6 +13,7 @@ export type InterfaceNFT = {
     name?: string,
     description: string
     price: string
+    loanId?: number
 }
 
 export const columns: ColumnDef<InterfaceNFT>[] = [

@@ -4,7 +4,7 @@ import { getLoans } from "./loanHandler";
 
 interface NftData {
     tokenId: number,
-    balance: number,
+    balance: bigint,
     tokenUri: string, //ipfs
     imageUrl: string, // https
     tokenType: string,
@@ -12,6 +12,7 @@ interface NftData {
     name: string,
     description: string
     price: string
+    loanId?: number
 }
 
 // Example usage of api
@@ -75,7 +76,7 @@ async function fetchNFTMetadata(contractAddress: `0x${string}`, tokenId: bigint)
 
     const nftData: NftData = {
         tokenId: parseInt(nft.tokenId),
-        balance: parseInt(nft.balance),
+        balance: nft.balance,
         tokenUri: nft.tokenUri,
         imageUrl: image.cachedUrl,
         tokenType: nft.tokenType,
@@ -100,7 +101,7 @@ async function getStakeNFTsUser(account: any) {
 
         const mappedNftData: NftData = {
             tokenId: nftData.tokenId,
-            balance: Number(loan.balance), // here balance of loan in GHO
+            balance: loan.balance, // here balance of loan in GHO
             tokenUri: nftData.tokenUri,
             imageUrl: nftData.imageUrl,
             tokenType: nftData.tokenType,
@@ -108,6 +109,7 @@ async function getStakeNFTsUser(account: any) {
             name: nftData.name, // use this name in ui
             description: nftData.description,
             price: loan.entryPrice.toString(),
+            loanId: loan.id
         };
 
         nftsData.push(mappedNftData);

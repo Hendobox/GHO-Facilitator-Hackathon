@@ -95,12 +95,12 @@ export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) 
 
                         <div style={assetsTable}>
                             <div> Assets table </div>
-                            <Button
+                            {/* <Button
                                 variant="ghost"
                                 onClick={() => setLoanRepay(true)}
                             >
                                 Loan Repay Button Placeholder
-                            </Button>
+                            </Button> */}
                         </div>
                     </div>
                 )

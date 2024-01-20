@@ -29,7 +29,8 @@ function NoActiveLoan() {
     )
 }
 
-function ActiveLoan({ data }: RepayLoanProps) {
+function ActiveLoan({ balance,
+    loanId }: RepayLoanProps) {
 
     const account = useAccount()
     const [amount, setAmount] = useState(0)
@@ -44,12 +45,12 @@ function ActiveLoan({ data }: RepayLoanProps) {
             });
         }
 
-        if (data) {
+        if (loanId && balance && BigInt(balance) >= BigInt(0)) {
             const hash = await repayDebt(
                 account,
                 { id: chain },
                 {
-                    loanId: BigInt(data?.id),
+                    loanId: BigInt(loanId),
                     amount: BigInt(amount * (10 ** 18))
                 }
             )
@@ -70,7 +71,7 @@ function ActiveLoan({ data }: RepayLoanProps) {
                         Due amount
                     </div>
                     <div className="text-xl font-semibold tracking-[-0.1] leading-[28px] text-white">
-                        {(data?.balance)?.toLocaleString('en-IN')}
+                        {(balance)?.toLocaleString('en-IN')}
                     </div>
                 </div>
             </div >
@@ -127,7 +128,9 @@ function ActiveLoan({ data }: RepayLoanProps) {
 }
 
 interface RepayLoanProps {
-    data?: LoanData
+    balance?: bigint,
+    loanId?: number,
+    noLoans?: boolean
 }
 export default function RepayLoan(props: RepayLoanProps) {
     return (
@@ -136,7 +139,8 @@ export default function RepayLoan(props: RepayLoanProps) {
                 <div className="text-sm font-medium leading-[24px] text-[#a1a1aa]">
                     Repay loan
                 </div>
-                {props.data ? <ActiveLoan data={props.data} /> : <NoActiveLoan />}
+                {props.noLoans ? <NoActiveLoan /> :
+                    <ActiveLoan balance={props.balance} loanId={props.loanId} />}
             </div>
         </div >
     )
