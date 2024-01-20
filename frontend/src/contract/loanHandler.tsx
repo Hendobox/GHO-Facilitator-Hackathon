@@ -9,6 +9,22 @@ const LoanCoreABI = LoanCoreArtifact.abi;
 
 const unHODLContractAddress = '0x0886073e6c0da2cE601D1eC846cE2B7E0294b91E';
 
+async function calculateInterestRate(account: any, loanAmount: bigint) {
+    const client = await account.connector?.getWalletClient();
+
+    const interestRate = await publicActions(client).readContract({
+        address: unHODLContractAddress,
+        abi: LoanCoreABI,
+        functionName: 'interestRate',
+        account: client.account.address,
+        args: [
+            loanAmount
+        ]
+    }) as number;
+
+    return interestRate ?? 10.5
+}
+
 // Usage in frontend
 //  const account = useAccount(); // get account from conneckit hook, and pass here
 // async function testIntegration() {
@@ -153,4 +169,4 @@ async function repayDebt(
     return hash
 }
 
-export { startLoan, repayDebt, getLoans };
+export { startLoan, repayDebt, getLoans, calculateInterestRate };
