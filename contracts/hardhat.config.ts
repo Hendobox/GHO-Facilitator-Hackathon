@@ -30,40 +30,25 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       forking: {
-        url: "https://sepolia.gateway.tenderly.co	",
-        blockNumber: 5083329,
+        url: "https://sepolia.gateway.tenderly.co",
+        blockNumber: 5071093,
+        // url: "https://sepolia-rollup.arbitrum.io/rpc",
       },
-      chainId: 11155111,
     },
     sepolia: {
-      url: "https://eth-sepolia.g.alchemy.com/v2/CvGnxp1M23ddg9DSf9ZwNSIXXqPzS52E",
-      accounts: [process.env.PVT_KEY as string],
-    },
-    goerli: {
-      url: "https://eth-goerli.g.alchemy.com/v2/CvGnxp1M23ddg9DSf9ZwNSIXXqPzS52E",
+      url: "https://sepolia.gateway.tenderly.co",
       accounts: [process.env.PVT_KEY as string],
     },
     arbisepolia: {
-      url: "https://arb-sepolia.g.alchemy.com/v2/mjXgVMd5C1IQaZYRMOv_tCC6GqwPMRkx",
+      url: "https://sepolia-rollup.arbitrum.io/rpc",
       accounts: [process.env.PVT_KEY as string],
     },
   },
   etherscan: {
     apiKey: {
       sepolia: process.env.ETHERSCAN_API_KEY as string,
-      goerli: process.env.ETHERSCAN_API_KEY as string,
-      arbisepolia: process.env.ETHERSCAN_API_KEY as string,
+      arbitrumSepolia: process.env.ETHERSCAN_API_KEY as string,
     },
-    customChains: [
-      {
-        network: "arbisepolia",
-        chainId: 421614,
-        urls: {
-          apiURL: "https://api-sepolia.arbiscan.io/api",
-          browserURL: "https://sepolia.arbiscan.io/",
-        },
-      },
-    ],
   },
 };
 

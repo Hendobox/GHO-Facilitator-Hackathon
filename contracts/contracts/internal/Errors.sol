@@ -4,6 +4,10 @@ pragma solidity 0.8.21;
 
 error Only_Whitelisted_NFT();
 
+error Bucket_Oversused();
+
+error Margin_Error();
+
 error Exceeds_Maximum_Borrowable();
 
 error Invalid_Loan_State();

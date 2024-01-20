@@ -2,25 +2,23 @@
 
 pragma solidity 0.8.21;
 
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-
-import "./Whitelister.sol";
-import "./RiskManagementSender.sol";
+import "./internal/Whitelister.sol";
+import "./internal/CCIP_Sender.sol";
 import "./interfaces/ILoanCore.sol";
-import "./Chainlink.sol";
-import "./Facilitator.sol";
+import "./libraries/ChainlinkDataLib.sol";
+import "./libraries/AaveFacilitatorLib.sol";
 import "hardhat/console.sol";
 
-contract LoanCore is
-    RiskManagementSender,
-    Chainlink,
-    Facilitator,
+contract unHODL is
+    CCIP_Sender,
     Whitelister,
     ILoanCore,
     Pausable,
+    IERC721Receiver,
     ReentrancyGuard
 {
     using SafeERC20 for IERC20;
@@ -32,18 +30,13 @@ contract LoanCore is
     IERC20 public aTokenUSDC;
     address public receiver;
     address public destinationGHO;
-
-    // =================== Constants =====================
-
     uint256 private constant BASIS_POINTS_DENOMINATOR = 1e4;
-
-    // =================== Loan State =====================
-
     uint256 public loanIdTracker;
     uint256 public interestRate = 1e3; // 10.00 %
+    uint256 public usdcTreasuryBalance;
+    uint256 public ghoTreasuryBalance;
 
-    mapping(uint256 => LoanLibrary.LoanData) public loans;
-    mapping(address => mapping(uint160 => bool)) public usedNonces;
+    mapping(uint256 => LoanLibrary.LoanData) private loans;
     ///      Key is hash of (collateralAddress, collateralId).
     mapping(bytes32 => bool) private collateralInUse;
 
@@ -57,14 +50,49 @@ contract LoanCore is
         address ccipRouter,
         address receiver_,
         uint64 _destinationChainSelector
-    )
-        Whitelister(owner_)
-        RiskManagementSender(ccipRouter, _destinationChainSelector)
-    {
+    ) Whitelister(owner_) CCIP_Sender(ccipRouter, _destinationChainSelector) {
         USDC = IERC20(usdc);
         GHO = IERC20(gho);
         aTokenUSDC = IERC20(aTokenUsdc);
         receiver = receiver_;
+    }
+
+    // ====================================== LIFECYCLE OPERATIONS ======================================
+
+    function demo_purpose_addUsdcToTreasury(uint256 amount) external onlyOwner {
+        USDC.safeTransferFrom(msg.sender, address(this), amount);
+        unchecked {
+            usdcTreasuryBalance += amount;
+        }
+    }
+
+    function demo_purpose_addGhoToTreasury(uint256 amount) external onlyOwner {
+        GHO.safeTransferFrom(msg.sender, address(this), amount);
+        unchecked {
+            ghoTreasuryBalance += amount;
+        }
+    }
+
+    // to recover assets from demo contract to final version
+    function drain(address to) external onlyOwner {
+        uint256 ghoBalance = GHO.balanceOf(address(this));
+        uint256 usdcBalance = USDC.balanceOf(address(this));
+        uint256 ethBalance = address(this).balance;
+
+        if (ghoBalance > 0) {
+            ghoTreasuryBalance -= ghoBalance;
+            GHO.safeTransfer(to, ghoBalance);
+        }
+
+        if (usdcBalance > 0) {
+            usdcTreasuryBalance -= usdcBalance;
+            GHO.safeTransfer(to, usdcBalance);
+        }
+
+        if (ethBalance > 0) {
+            (bool success, ) = payable(to).call{value: ethBalance}("");
+            require(success, "ETH transfer error");
+        }
     }
 
     // ====================================== LIFECYCLE OPERATIONS ======================================
@@ -85,8 +113,8 @@ contract LoanCore is
         );
         if (collateralInUse[collateralKey]) revert Collateral_In_Use();
 
-        uint256 floorPriceUSD = uint256(getLatestPrice());
-        uint256 maxBorrowable = calculateCollateralValue(floorPriceUSD);
+        uint256 floorPriceUSD = uint256(ChainlinkDataLib.getLatestPrice());
+        uint256 maxBorrowable = calculateCollateralValue(floorPriceUSD, true);
 
         if (terms.principal > maxBorrowable)
             revert Exceeds_Maximum_Borrowable();
@@ -118,26 +146,41 @@ contract LoanCore is
             owner: msg.sender
         });
 
+        uint256 availableBorrowsBase;
+
         if (terms.facilitator == LoanLibrary.Facilitator.Native) {
-            // handleNative();
+            _nativeFacilitator(terms.principal);
+            availableBorrowsBase = calculateCollateralValue(
+                floorPriceUSD,
+                false
+            );
         } else {
             // create the approval to aave pool
-            USDC.approve(address(aaveV3Pool), maxBorrowable);
+            USDC.approve(address(AaveFacilitatorLib.aaveV3Pool), floorPriceUSD);
 
-            // supply the asset to Aave
-            supplyAaveUSDC(address(USDC), maxBorrowable, address(this));
-
-            (, , uint256 availableBorrowsBase, , , ) = getUserAccountData(
+            // supply the USDC asset to Aave
+            AaveFacilitatorLib.supplyAaveUSDC(
+                address(USDC),
+                floorPriceUSD,
                 address(this)
             );
+
+            usdcTreasuryBalance -= maxBorrowable;
+
+            (, , availableBorrowsBase, , , ) = AaveFacilitatorLib
+                .getUserAccountData(address(this));
 
             // console.log("availableBorrowsBase: ", availableBorrowsBase);
 
             if (availableBorrowsBase > maxBorrowable) {
-                // Borrow GHO
-                borrowAaveGHO(address(GHO), maxBorrowable, address(this));
+                // Borrow GHO from Aave
+                AaveFacilitatorLib.borrowAaveGHO(
+                    address(GHO),
+                    availableBorrowsBase,
+                    address(this)
+                );
             } else {
-                // handleNative();
+                revert Margin_Error(); // our 30% collateral will cover for Aave's 20%. this is assumint the rates do not change
             }
         }
 
@@ -149,12 +192,13 @@ contract LoanCore is
 
         // evaluate available GHO for secondary pool in cross-chain with CCIP
 
-        uint256 amountOverCollateralized = floorPriceUSD - maxBorrowable;
+        uint256 amountOverCollateralized = availableBorrowsBase - maxBorrowable;
         uint256 userBal = maxBorrowable - terms.principal;
 
         // enter Savvy for risk management revenue
 
         supplySavvyCCIP(
+            address(GHO),
             receiver,
             amountOverCollateralized,
             userBal,
@@ -183,9 +227,9 @@ contract LoanCore is
         GHO.safeTransferFrom(msg.sender, address(this), amountPlusInterest);
 
         if (data.terms.facilitator == LoanLibrary.Facilitator.Native) {
-            // handleNativeRepay();
+            ghoTreasuryBalance += amountPlusInterest;
         } else {
-            // (, uint256 totalDebtBase, , , uint256 ltv, ) = getUserAccountData(
+            // (, uint256 totalDebtBase, , , uint256 ltv, ) = AaveFacilitatorLib.getUserAccountData(
             //     address(this)
             // );
 
@@ -193,10 +237,18 @@ contract LoanCore is
             // console.log("ltv:", ltv);
 
             // create the approval to aave pool
-            GHO.approve(address(aaveV3Pool), amountPlusInterest);
+            GHO.approve(
+                address(AaveFacilitatorLib.aaveV3Pool),
+                amountPlusInterest
+            );
 
             // Borrow GHO
-            repayAave(address(GHO), amountPlusInterest, 2, address(this));
+            AaveFacilitatorLib.repayAave(
+                address(GHO),
+                amountPlusInterest,
+                2,
+                address(this)
+            );
         }
 
         // state changes
@@ -239,8 +291,8 @@ contract LoanCore is
         // Ensure valid initial loan state when claiming loan
         if (data.state != LoanLibrary.LoanState.Active) revert Invalid_State();
 
-        uint256 floorPriceUSD = uint256(getLatestPrice());
-        uint256 maxBorrowable = calculateCollateralValue(floorPriceUSD);
+        uint256 floorPriceUSD = uint256(ChainlinkDataLib.getLatestPrice());
+        uint256 maxBorrowable = calculateCollateralValue(floorPriceUSD, true);
 
         if (maxBorrowable > data.balance) revert Not_Unhealthy();
 
@@ -274,9 +326,14 @@ contract LoanCore is
     }
 
     function calculateCollateralValue(
-        uint256 amount
+        uint256 amount,
+        bool withAave
     ) public pure returns (uint256) {
-        return (amount * 70) / 100;
+        if (withAave) {
+            return ((amount * 70) / 100);
+        } else {
+            return ((amount * 95) / 100);
+        }
     }
 
     function calculateInterest(
@@ -292,5 +349,36 @@ contract LoanCore is
                 (loanData.balance * timeSinceLastPayment * interestRate) /
                 (BASIS_POINTS_DENOMINATOR * 365 days);
         }
+    }
+
+    function getLatestPrice() external view returns (int256) {
+        return ChainlinkDataLib.getLatestPrice();
+    }
+
+    function getLoan(
+        uint256 loanId
+    ) external view returns (LoanLibrary.LoanData memory loanData) {
+        return loans[loanId];
+    }
+
+    function _nativeFacilitator(uint256 amount) private {
+        if (amount > 0) {
+            if (amount > ghoTreasuryBalance) revert Bucket_Oversused();
+            ghoTreasuryBalance -= amount;
+        }
+    }
+
+    function onERC721Received(
+        address operator,
+        address from,
+        uint256 tokenId,
+        bytes calldata data
+    ) external override returns (bytes4) {
+        require(
+            msg.sender == address(this),
+            "Only unHODL contract allowed to collect"
+        );
+
+        return IERC721Receiver.onERC721Received.selector;
     }
 }

@@ -5,7 +5,7 @@ pragma solidity 0.8.21;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/access/extensions/AccessControlEnumerable.sol";
 import "./Errors.sol";
-import "./interfaces/IWhitelister.sol";
+import "../interfaces/IWhitelister.sol";
 
 contract Whitelister is AccessControlEnumerable, Ownable, IWhitelister {
     mapping(address => bool) _isWhitelistedNFT;
