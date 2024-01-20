@@ -1,11 +1,12 @@
 
 import { WalletClient } from 'wagmi';
 import LoanCoreArtifact from './abi/unHODL.json';
+import NftArtifact from './abi/NFT.json'
 import { publicActions } from 'viem';
 import { LoanData, LoanState, LoanTerms, RepayTerms } from './loanTypes';
 
 const LoanCoreABI = LoanCoreArtifact.abi;
-
+const NftABI = NftArtifact.abi;
 
 const unHODLContractAddress = '0x0886073e6c0da2cE601D1eC846cE2B7E0294b91E';
 
@@ -56,6 +57,22 @@ async function startLoan(
 ) {
 
     const client: WalletClient = await account.connector?.getWalletClient()
+
+    const nfthash = await client.writeContract(
+        {
+            address: collateralAddress as `0x${string}`,
+            abi: NftABI,
+            functionName: 'approve',
+            chain: chain,
+            account: client.account.address,
+            args: [
+                unHODLContractAddress,
+                collateralId
+            ]
+        }
+    )
+
+    console.log(`NFT approved txn: ${nfthash}`)
 
     const hash = await client.writeContract(
         {
