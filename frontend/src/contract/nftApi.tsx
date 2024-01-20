@@ -67,31 +67,24 @@ async function fetchNFTMetadata(contractAddress: `0x${string}`, tokenId: bigint)
     const options = { method: 'GET', headers: { accept: 'application/json' } }
     const apiKey = import.meta.env.VITE_ALCHEMY_ID
 
-    const data = await fetch(`https://eth-sepolia.g.alchemy.com/nft/v3/${apiKey}/getNFTMetadata?contractAddress=${contractAddress}&tokenId=${tokenId}&refreshCache=fals`, options)
+    const data = await fetch(`https://eth-sepolia.g.alchemy.com/nft/v3/${apiKey}/getNFTMetadata?contractAddress=${contractAddress}&tokenId=${tokenId}&refreshCache=false`, options)
 
     const json = await data.json()
-    const nfts = json.ownedNfts
+    const nft = json.contract
+    const image = json.image
 
-    const nftData: NftData = nfts.map((nft: {
-        tokenId: string,
-        balance: string,
-        tokenUri: string,
-        image: { cachedUrl: string },
-        tokenType: string,
-        contract: { address: string, name: string },
-        description: string
-    }) => ({
+    const nftData: NftData = {
         tokenId: parseInt(nft.tokenId),
         balance: parseInt(nft.balance),
         tokenUri: nft.tokenUri,
-        imageUrl: nft.image.cachedUrl,
+        imageUrl: image.cachedUrl,
         tokenType: nft.tokenType,
-        contractAddress: nft.contract.address,
-        name: nft.contract.name,
+        contractAddress: nft.address,
+        name: nft.name,
         description: nft.description,
-        price: parseFloat((5398000000 / (10 ** 6)).toString()),
-    })
-    );
+        price: "fetch balance instead of price"
+        // price: parseFloat((5398000000 / (10 ** 6)).toString()),
+    }
 
     return nftData;
 }

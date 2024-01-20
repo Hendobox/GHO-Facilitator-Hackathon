@@ -48,7 +48,10 @@ export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) 
 
     useEffect(() => {
         if (account) {
-            getStakeNFTsUser(account)
+            (async () => {
+                const nfts = await getStakeNFTsUser(account)
+                console.log(nfts)
+            })()
         }
     })
     return (
