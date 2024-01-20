@@ -1,6 +1,6 @@
 export default function LandingPage() {
     return (
-        <div className="text-white">
+        <div>
             Landing page
         </div>
     )

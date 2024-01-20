@@ -1,36 +1,15 @@
-import { Checkbox } from "@radix-ui/react-checkbox"
+import { Button } from "@/components/ui/button"
+import Checks from "@/components/ui/icons/checks"
 import { ColumnDef } from "@tanstack/react-table"
+import { motion } from "framer-motion"
 
-export type Payment = {
+export type InterfaceNFT = {
     imageUrl: string
     description: string
     price: number
-    link: string
 }
 
-export const columns: ColumnDef<Payment>[] = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
+export const columns: ColumnDef<InterfaceNFT>[] = [
     {
         accessorKey: "imageUrl",
         header: "Asset",
@@ -48,11 +27,11 @@ export const columns: ColumnDef<Payment>[] = [
     },
     {
         accessorKey: "description",
-        header: "description",
+        header: "Description",
     },
     {
         accessorKey: "price",
-        header: "price",
+        header: "Floor price",
         cell: ({ row }) => {
             return (
                 <div className="flex items-center">
@@ -62,8 +41,22 @@ export const columns: ColumnDef<Payment>[] = [
         }
     },
     {
-        accessorKey: "link",
-        header: "Explore",
-        cell: info => <a target="_blank" href={info.getValue() as string}>Go</a>
+        id: "select",
+        header: "Deposit",
+        cell: ({ row }) => {
+            return (
+                <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                >
+                    <Button
+                        variant={row.getIsSelected() ? "disabled" : "ghost"}
+                        onClick={() => row.toggleSelected(!row.getIsSelected())}
+                    >
+                        {row.getIsSelected() ? <Checks /> : "Add"}
+                    </Button>
+                </motion.div>
+            )
+        }
     },
 ]

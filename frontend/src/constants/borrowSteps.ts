@@ -11,13 +11,18 @@ export const borrowSteps: BorrowStep[] = [
         step: 1,
     },
     {
+        title: 'Choose product',
+        subtitle: 'Select which product best serves your needs. Don’t panic you can change this later',
+        step: 2,
+    },
+    {
         title: 'Review Loan Terms',
         subtitle: 'You’ve added the following assets as collateral. Confirm terms and proceed',
-        step: 2,
+        step: 3,
     },
     {
         title: 'Review & Confirm',
         subtitle: 'Review your transaction details and confirm',
-        step: 3,
+        step: 4,
     },
 ]
