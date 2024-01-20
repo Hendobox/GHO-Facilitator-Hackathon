@@ -182,3 +182,17 @@ function startLoan(LoanTerms calldata terms) external returns (uint256 loanId);
 - if terms.facilitator = 1, based on the available tresusry balance of USDC *usdcTreasuryBalance()*, the protocol will engage with Aave and send terms.principal to the message sender
 - The remaining allowance and over collateralized portion, through CCIP, makes a cross-chain investment into Savvy Defi.
 - The message sender's share is recorded in the Reciever contract *receiver()*
+
+2. #### Repay Debt
+This method is used when to repay a loan that was borrowed with a staked collateral by the message sender. It allows you to pay partly or fully. Interest rates also apply.
+
+```solidity
+function repayDebt(uint256 loanId, uint256 amount) external;
+```
+- caller must approve the smart contract in the GHO token smart contract
+- caller must be the oner of the loan with ID: **loanId**
+- **amount** must be not be more than the sum of *(getLoan(loanId)).balance + calculateInterest(loanId)*
+- if the maximum amount is paid, the underlying NFT gets sent back to the message sender, and a cross chain position exit occurs in the Savvy pool, which remits incentives to the off-chain wallet of the user if they had some unborrowed allowance all along
+- else, the repayment is sent to  the Aave repay if a=Aave facilitator was used for the loan with the id, Or it gets added to the Native bucket
+- Any excess is sent to the cross-chain risk management strategy
+
