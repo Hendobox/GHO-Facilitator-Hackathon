@@ -38,7 +38,8 @@ const Item: React.FC<ItemProps> = ({ title, isSelected, onSelect }) => {
         width: '180px',
         height: '48px',
         background: isSelected ? '#27272A' : undefined,
-        cursor: 'pointer'
+        cursor: 'pointer',
+        borderRadius: '4px'
     };
 
     return (

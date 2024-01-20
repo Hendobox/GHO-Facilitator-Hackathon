@@ -74,7 +74,7 @@ export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) 
                         Claim assets
                     </div>
                     <div style={subHeaderBody}>
-                        lorem ipsum color damut lorem ipsum color damut lorem ipsum color damut
+                        Claim your assets here
                     </div>
 
                     <div style={assetsTable}>
