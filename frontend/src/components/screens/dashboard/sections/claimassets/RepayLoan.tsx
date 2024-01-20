@@ -2,7 +2,6 @@ import { DropDownSelect } from "@/components/ui/dashboard/DropDownSelect"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/use-toast"
 import { repayDebt } from "@/contract/loanHandler"
-import { LoanData } from "@/contract/loanTypes"
 import { useState } from "react"
 import { useAccount } from "wagmi"
 
@@ -42,6 +41,7 @@ function ActiveLoan({ balance,
             toast({
                 title: "Invalid amount",
                 description: `please set valid amount`,
+                variant: "ghost"
             });
         }
 
@@ -58,6 +58,7 @@ function ActiveLoan({ balance,
             toast({
                 title: "Transaction Hash",
                 description: `${hash}%`,
+                variant: "ghost"
             });
         }
     }

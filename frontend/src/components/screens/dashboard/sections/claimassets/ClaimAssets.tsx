@@ -1,12 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { CSSProperties, useEffect, useState } from "react";
-import LoanRepaymentSection from "./LoanRepayment";
-import { motion } from 'framer-motion';
-import { useAccount } from "wagmi";
-import { getStakeNFTsUser } from '@/contract/nftApi'
 import { InterfaceNFT } from "@/components/screens/borrow/steps/depositNFT/columns";
 import { DataTable } from "@/components/screens/borrow/steps/depositNFT/data-table";
+import { getStakeNFTsUser } from '@/contract/nftApi';
 import { RowSelectionState } from "@tanstack/react-table";
+import { motion } from 'framer-motion';
+import { CSSProperties, useEffect, useState } from "react";
+import { useAccount } from "wagmi";
+import LoanRepaymentSection from "./LoanRepayment";
 import { columns } from "./columns";
 
 interface ClaimAssetsProps {
@@ -46,10 +45,16 @@ export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) 
         color: "#A1A1AA"
     }
 
-    const assetsTable: CSSProperties = {
-    }
-
     const account = useAccount()
+
+    useEffect(() => {
+        Object.keys(rowSelection).length > 0 && setLoanRepay(true)
+    }, [rowSelection])
+
+    const resetState = () => {
+        setRowSelection({})
+        setLoanRepay(false)
+    }
 
     useEffect(() => {
         if (account && !data.length) {
@@ -61,7 +66,7 @@ export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) 
     }, [account, data.length, setData])
     return (
         <>
-            {loanRepay || Object.keys(rowSelection).length > 0 ?
+            {loanRepay ?
                 <div>
                     <motion.button
                         whileHover={{ scale: 1.05 }}
@@ -72,7 +77,7 @@ export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) 
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                             <path d="M10 12L6 8L10 4" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
-                        <span>Go back</span>
+                        <span onClick={resetState}>Go back</span>
                     </motion.button>
                     <LoanRepaymentSection nft={data.filter((_, index) => rowSelection[index])[0]} />
                 </div> :
@@ -91,17 +96,8 @@ export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) 
                             data={data}
                             rowSelection={rowSelection}
                             setRowSelection={setRowSelection}
+                            noAssetsCount
                         />
-
-                        <div style={assetsTable}>
-                            <div> Assets table </div>
-                            {/* <Button
-                                variant="ghost"
-                                onClick={() => setLoanRepay(true)}
-                            >
-                                Loan Repay Button Placeholder
-                            </Button> */}
-                        </div>
                     </div>
                 )
             }

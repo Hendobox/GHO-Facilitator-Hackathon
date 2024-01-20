@@ -44,6 +44,7 @@ export default function Borrow() {
         toast({
             title: "Transaction Hash",
             description: `${hash}%`,
+            variant: "ghost"
         });
     }
 
@@ -53,6 +54,7 @@ export default function Borrow() {
                 toast({
                     title: `Loan Amount ${loanAmount} invalid!`,
                     description: `Specify valid loan amount`,
+                    variant: "ghost"
                 });
                 return
             }

@@ -33,20 +33,24 @@ const LoanTerms = ({
 }) => {
     const [amount, setAmount] = useState<string>('');
     const [address, setAddress] = useState<string>('');
-    const [duration, setDuration] = useState<string>('');
+    const [duration, setDuration] = useState<string>('30');
     const [network, setNetwork] = useState<NetworkType>('Sepolia');
     const [interestRate, setInterestRate] = useState<number>(0);
-    // use toast when rate updates
     const { toast } = useToast();
-    const loanAmount = +amount;
     const interestPct = interestRate;
-    const dueDate = "03/28/2024";
-    const interest = `${(interestRate * loanAmount) / 100}`;
-    const dueAmount = loanAmount + interest;
-    const apy = 204;
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + parseInt(duration));
+    const formattedDueDate = dueDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    const interest = `${(interestRate * +amount) / 100}`;
+    const dueAmount = +amount + +interest;
+    const apy = ((interestRate / +amount) * +duration * 8);
+    const displayApy = isNaN(apy) || !isFinite(apy) ? '12.4%' : `${apy.toFixed(2)}%`;
+
+    const earnings = (+amount * (apy / 100)) * (+duration / 365);
+    const displayEarnings = isNaN(earnings) || !isFinite(earnings) ? 'N/A' : `${earnings.toFixed(2)} GHO`;
+
 
     const maxAmount = 1000;
-    console.log("🚀 ~ LoanTerms ~ network:", network)
 
     const account = useAccount()
 
@@ -65,7 +69,7 @@ const LoanTerms = ({
             setAddress(account.address)
         }
 
-    }, [amount]);
+    }, [account, amount]);
 
 
     return (
@@ -96,7 +100,7 @@ const LoanTerms = ({
                                 setLoanAmount(parseFloat(value))
                             }}
                             placeholder="0.0"
-                            subtext="Amount cannot exceed xx.yy GHO"
+                            subtext={<span>Amount cannot exceed <b>{maxAmount}</b> GHO</span>}
                             icon="document"
                             actionElement={
                                 <Button
@@ -152,6 +156,7 @@ const LoanTerms = ({
                                     toast({
                                         title: "Interest rate updated",
                                         description: `Interest rate updated to ${interestRate}%`,
+                                        variant: "ghost"
                                     });
                                 }}
                             >
@@ -178,16 +183,16 @@ const LoanTerms = ({
                                 <div className="flex flex-row justify-between mt-2">
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Loan amount</span>
-                                        <span>{loanAmount} GHO</span>
+                                        <span>{amount || 0} GHO</span>
                                     </div>
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Interest {interestPct} %</span>
                                         <span>{interest} GHO</span>
                                     </div>
-                                    <div className="flex flex-col justify-between gap-2">
+                                    {chosenProduct !== "borrow" && <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Due date</span>
-                                        <span>{dueDate}</span>
-                                    </div>
+                                        <span>{formattedDueDate.toString()}</span>
+                                    </div>}
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Due amount</span>
                                         <span>{dueAmount} GHO</span>
@@ -205,15 +210,15 @@ const LoanTerms = ({
                                 <div className="flex flex-row justify-between mt-2">
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Duration</span>
-                                        <span>{duration} days</span>
+                                        <span>{duration || 0} days</span>
                                     </div>
                                     <div className="flex flex-col justify-between gap-2">
-                                        <span className="text-sm text-zinc-400">APY (3.4%)</span>
-                                        <span>{apy} GHO</span>
+                                        <span className="text-sm text-zinc-400">APY (%)</span>
+                                        <span>{displayApy}</span>
                                     </div>
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Total earnings</span>
-                                        <span>324,342 GHO</span>
+                                        <span>{displayEarnings}</span>
                                     </div>
                                 </div>
                             </AccordionContent>

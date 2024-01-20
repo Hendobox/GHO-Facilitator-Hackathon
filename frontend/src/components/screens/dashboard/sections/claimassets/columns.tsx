@@ -39,6 +39,17 @@ export const columns: ColumnDef<InterfaceNFT>[] = [
         }
     },
     {
+        accessorKey: "balance",
+        header: "Loan amount",
+        cell: ({ row }) => {
+            return (
+                <div className="flex items-center">
+                    {row.getValue("balance")} ETH
+                </div>
+            );
+        }
+    },
+    {
         id: "select",
         header: "Deposit",
         cell: ({ row }) => {

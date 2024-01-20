@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { ReactNode } from "react"
 
 export default function CustomInput({
     value,
@@ -23,8 +24,8 @@ export default function CustomInput({
     disabled?: boolean
     label?: string
     icon?: string
-    subtext?: string
-    actionElement?: React.ReactNode
+    subtext?: string | ReactNode
+    actionElement?: ReactNode
 }) {
     return (
         <div className="flex flex-col gap-1 w-full">
@@ -51,8 +52,10 @@ export default function CustomInput({
                     readOnly={readOnly}
                     {...props}
                 />
-                {actionElement && <div className="absolute right-0 top-0 h-full">
-                    {actionElement}
+                {actionElement && <div className="absolute right-0 top-0 h-full bg-zinc-800 pl-3">
+                    <div className="h-full">
+                        {actionElement}
+                    </div>
                 </div>}
             </div>
             {
