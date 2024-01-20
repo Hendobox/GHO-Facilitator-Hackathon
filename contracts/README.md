@@ -190,9 +190,67 @@ This method is used when to repay a loan that was borrowed with a staked collate
 function repayDebt(uint256 loanId, uint256 amount) external;
 ```
 - caller must approve the smart contract in the GHO token smart contract
+- caller must have at least **amount** in thier wallet
 - caller must be the oner of the loan with ID: **loanId**
 - **amount** must be not be more than the sum of *(getLoan(loanId)).balance + calculateInterest(loanId)*
 - if the maximum amount is paid, the underlying NFT gets sent back to the message sender, and a cross chain position exit occurs in the Savvy pool, which remits incentives to the off-chain wallet of the user if they had some unborrowed allowance all along
 - else, the repayment is sent to  the Aave repay if a=Aave facilitator was used for the loan with the id, Or it gets added to the Native bucket
-- Any excess is sent to the cross-chain risk management strategy
+- Any excess is sent to the cross-chain risk management strategy.
 
+3. #### Claim
+This method is used to claim any collateral in a poor health condition. It is permissionless and can be utilized by anybody.
+
+```solidity
+function claim(uint256 loanId) external;
+```
+- message sender must not be the owner of the loan with ID: **loanId**
+- caller must approve the smart contract in the GHO token smart contract up to the required amount
+- the required amount to pay is calculated by: *calculateCollateralValue(getLatestPrice(), true) + calculateInterest(loanId);*
+- caller must have the equivilent balance in their wallet 
+- when done, the caller received the undelying NFT
+
+
+## CCIP_Receiver contract
+
+This contrat holds the destination chain logic. It is triggered by the CCIP router when an initial transaction is made on the source chain.
+
+1. #### Gho
+
+```solidity
+function gho() external view returns (address);
+```
+
+- returns the address of GHO token on the destination chain
+
+2. #### Yield Token
+
+```solidity
+function yieldToken() external view returns (address);
+```
+- returns the yeild token address of GHO and svUSD.
+
+3. #### Shares
+
+```solidity
+function shares(address who) external view returns (uint235);
+```
+
+- returns the amount in Savvy Defi shares owned by **who**
+
+4. #### Shares to base Tokens
+
+```solidity
+function sharesToBaseTokens(address recipient)external view returns (uint256)
+```
+
+- returns the GHO amount plus earnings owned by **recipient** on the Savvy Pool
+
+
+## Getting Started With the Deployed Contract
+
+- owner whitelists supported NFT address.
+- owner calls the approve function of the GHO token contract, passing in the unHold contract address, and amount to supply to the Native Bucket treasury.
+- owner calls the approve function of the USDC token contract, passing in the unHold contract address, and amount to supply to the Aave treasury.
+- owner calls the `demo_purpose_addUsdcToTreasury(uint256 amount)` method to supply amount USDC to serve the Aave V3 treasury.
+- owner calls the `demo_purpose_addGhoToTreasury(uint256 amount)` method to supply amount GHO to serve Native treasury.
+- ETH must to be transfered to the unHODL smart contract for chainlink CCIP payments
