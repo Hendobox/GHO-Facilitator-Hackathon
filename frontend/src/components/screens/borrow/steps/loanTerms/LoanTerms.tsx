@@ -6,8 +6,9 @@ import { useEffect, useState } from 'react';
 import { ProductType } from "../../Borrow";
 import { Switch } from "@/components/ui/switch";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useAccount } from "wagmi";
 
-type NetworkType = 'ETH' | 'BSC';
+type NetworkType = 'Sepolia' | 'Arbitrum Sepolia' | "Ethereum" | "Arbitrum";
 const Durations: Record<string, string> = {
     "7": "1 week",
     "14": "2 weeks",
@@ -22,15 +23,17 @@ const Durations: Record<string, string> = {
 
 const LoanTerms = ({
     chosenProduct,
-    setProductType
+    setProductType,
+    setLoanAmount
 }: {
     chosenProduct: ProductType,
     setProductType: (product: ProductType) => void
+    setLoanAmount: (loanAmount: number) => void
 }) => {
     const [amount, setAmount] = useState<string>('');
     const [address, setAddress] = useState<string>('');
     const [duration, setDuration] = useState<string>('');
-    const [network, setNetwork] = useState<NetworkType>('ETH');
+    const [network, setNetwork] = useState<NetworkType>('Sepolia');
     const [interestRate, setInterestRate] = useState<number>(0);
     // use toast when rate updates
     const { toast } = useToast();
@@ -44,11 +47,19 @@ const LoanTerms = ({
     const maxAmount = 1000;
     console.log("🚀 ~ LoanTerms ~ network:", network)
 
+    const account = useAccount()
+
     useEffect(() => {
         if (+amount < 0) return;
         const interestRate = +amount * Math.random();
         setInterestRate(interestRate);
+
+        if (account?.address) {
+            setAddress(account.address)
+        }
+
     }, [amount]);
+
 
     return (
         <div className="flex flex-row justify-between gap-10">
@@ -73,7 +84,10 @@ const LoanTerms = ({
                         <CustomInput
                             label="Loan amount in GHO"
                             value={amount}
-                            onChange={setAmount}
+                            onChange={(value) => {
+                                setAmount(value)
+                                setLoanAmount(parseFloat(value))
+                            }}
                             placeholder="0.0"
                             subtext="Amount cannot exceed xx.yy GHO"
                             icon="document"
@@ -81,7 +95,10 @@ const LoanTerms = ({
                                 <Button
                                     variant="simple"
                                     className="h-full text-[#D97706]"
-                                    onClick={() => setAmount(`${maxAmount}`)}
+                                    onClick={() => {
+                                        setAmount(`${maxAmount}`)
+                                        setLoanAmount(parseFloat(maxAmount.toString()))
+                                    }}
                                 >
                                     MAX
                                 </Button>
@@ -94,17 +111,19 @@ const LoanTerms = ({
                             placeholder="Address"
                             icon="document"
                             actionElement={
-                                <Select
+                                <Select defaultValue={network}
                                     onValueChange={(e: NetworkType) => {
                                         setNetwork(e);
                                     }}
                                 >
                                     <SelectTrigger className="h-full border-none bg-zinc-700">
-                                        <SelectValue placeholder="Network" />
+                                        <SelectValue placeholder={network} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-zinc-700 text-white border-none">
-                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="ETH">ETH</SelectItem>
-                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="BSC">BSC</SelectItem>
+                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="Sepolia">Sepolia</SelectItem>
+                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="Arbitrum Sepolia">Arbitrum Sepolia</SelectItem>
+                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="Ethereum">Ethereum</SelectItem>
+                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="Arbitrum">Arbitrum</SelectItem>
                                     </SelectContent>
                                 </Select>
 

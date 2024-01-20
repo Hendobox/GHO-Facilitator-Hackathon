@@ -1,6 +1,6 @@
 
 import { WalletClient } from 'wagmi';
-import LoanCoreArtifact from './abi/LoanCore.json';
+import LoanCoreArtifact from './abi/unHODL.json';
 
 const LoanCoreABI = LoanCoreArtifact.abi;
 
@@ -8,7 +8,6 @@ interface LoanTerms {
     collateralAddress: string; // crypto punk address
     collateralId: bigint; // dummy token id of nft
     principal: bigint; // input borrowing amount, max borrowable buttn pull data from contract fn
-    destinationChainCCIP: number, // arbitrum chain
     facilitator: number; // aave or our facilitator input
 }
 
@@ -18,7 +17,7 @@ interface RepayTerms {
 }
 
 
-const contractAddress = '0x0273663d8612EE787cC52040699C44E4E55A3751';
+const unHODLContractAddress = '0x0886073e6c0da2cE601D1eC846cE2B7E0294b91E';
 
 // Usage in frontend
 //  const account = useAccount(); // get account from conneckit hook, and pass here
@@ -46,7 +45,6 @@ async function startLoan(
         collateralAddress,
         collateralId,
         principal,
-        destinationChainCCIP,
         facilitator
     }: LoanTerms,
 ) {
@@ -55,20 +53,18 @@ async function startLoan(
 
     const hash = await client.writeContract(
         {
-            address: contractAddress,
+            address: unHODLContractAddress,
             abi: LoanCoreABI,
             functionName: 'startLoan',
             chain: chain,
             account: client.account.address,
             args: [
-                account.address,
                 [
                     collateralAddress,
                     collateralId,
                     principal,
-                    destinationChainCCIP,
                     facilitator
-                ]
+                ],
             ]
         }
     )
@@ -88,7 +84,7 @@ async function repayDebt(
 
     const hash = await client.writeContract(
         {
-            address: contractAddress,
+            address: unHODLContractAddress,
             abi: LoanCoreABI,
             functionName: 'repayDebt',
             chain: chain,

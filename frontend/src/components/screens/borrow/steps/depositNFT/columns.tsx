@@ -3,10 +3,22 @@ import Checks from "@/components/ui/icons/checks"
 import { ColumnDef } from "@tanstack/react-table"
 import { motion } from "framer-motion"
 
+// export type InterfaceNFT = {
+//     imageUrl: string
+//     description: string
+//     price: number
+// }
+
 export type InterfaceNFT = {
-    imageUrl: string
+    tokenId?: number,
+    balance?: number,
+    tokenUri?: string, //ipfs
+    imageUrl: string, // https
+    tokenType?: string,
+    contractAddress?: string,
+    name?: string,
     description: string
-    price: number
+    price: string
 }
 
 export const columns: ColumnDef<InterfaceNFT>[] = [

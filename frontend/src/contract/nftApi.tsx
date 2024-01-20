@@ -2,11 +2,12 @@ interface NftData {
     tokenId: number,
     balance: number,
     tokenUri: string, //ipfs
-    imgUri: string, // htpps
+    imageUrl: string, // https
     tokenType: string,
     contractAddress: string,
     name: string,
     description: string
+    price: string
 }
 
 // Example usage of api
@@ -28,8 +29,7 @@ async function fetchNFTsUser(account: any) {
     const apiKey = import.meta.env.VITE_ALCHEMY_ID
     const accountAddress = account.address
 
-    // change to eth-sepolia for demo
-    const data = await fetch(`https://polygon-mumbai.g.alchemy.com/nft/v3/${apiKey}/getNFTsForOwner?owner=${accountAddress}&withMetadata=true&pageSize=100`, options);
+    const data = await fetch(`https://eth-sepolia.g.alchemy.com/nft/v3/${apiKey}/getNFTsForOwner?owner=${accountAddress}&withMetadata=true&pageSize=100`, options);
 
     const json = await data.json()
     const nfts = json.ownedNfts
@@ -37,13 +37,14 @@ async function fetchNFTsUser(account: any) {
     const nftData: NftData[] = nfts.map((nft:
         { tokenId: string; balance: any; tokenUri: any; image: { cachedUrl: any; }; tokenType: any; contract: { address: any; name: any; }; description: any; }) => ({
             tokenId: parseInt(nft.tokenId),
-            balance: nft.balance,
+            balance: parseInt(nft.balance),
             tokenUri: nft.tokenUri,
-            imgUri: nft.image.cachedUrl,
+            imageUrl: nft.image.cachedUrl,
             tokenType: nft.tokenType,
             contractAddress: nft.contract.address,
             name: nft.contract.name,
-            description: nft.description
+            description: nft.description,
+            price: parseFloat((5398000000 / (10 ** 19)).toString()),
         }));
 
     return nftData;

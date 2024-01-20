@@ -10,7 +10,7 @@ import { ProductType } from "../../Borrow";
 
 interface LoanSummaryProps {
     chosenProduct: ProductType;
-    selectedNFTs: InterfaceNFT[];
+    selectedNFT: InterfaceNFT;
     receiverAddress: string;
     loanAmount: number;
     interest: number;
@@ -23,7 +23,7 @@ interface LoanSummaryProps {
 }
 
 const LoanSummary: React.FC<LoanSummaryProps> = ({
-    selectedNFTs,
+    selectedNFT,
     receiverAddress,
     loanAmount,
     interest,
@@ -34,7 +34,7 @@ const LoanSummary: React.FC<LoanSummaryProps> = ({
     stakingPeriod,
     interestSaved,
 }) => {
-    const nft = selectedNFTs[0];
+    const nft = selectedNFT
     return (
         <div className="flex flex-row gap-10">
             <div className="flex flex-col gap-6">
@@ -42,14 +42,14 @@ const LoanSummary: React.FC<LoanSummaryProps> = ({
                 <div className="flex flex-row justify-between">
                     <div className="flex flex-col">
                         <span className="text-sm text-zinc-400">Asset</span>
-                        <span>{nft.description}</span>
+                        <span>{"# " + nft.tokenId}</span>
                     </div>
                     <div className="flex flex-col">
                         <span className="text-sm text-zinc-400">Floor price</span>
                         <span>{nft.price} WETH</span>
                     </div>
                 </div>
-                <span className="text-sm">{receiverAddress}</span>
+                <span className="text-sm">{nft.contractAddress}</span>
             </div>
             <div className="flex flex-col w-full gap-6">
                 <div className="flex flex-col gap-3">
