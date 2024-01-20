@@ -38,10 +38,10 @@ export const columns: ColumnDef<InterfaceNFT>[] = [
         },
     },
     {
-        accessorKey: "description",
-        header: "Description",
+        accessorKey: "name",
+        header: "Title",
         cell: ({ row }) => {
-            return row.getValue("description") || <span className="opacity-50">No description</span>
+            return row.getValue("name") || <span className="opacity-50">No title</span>
         }
     },
     {
