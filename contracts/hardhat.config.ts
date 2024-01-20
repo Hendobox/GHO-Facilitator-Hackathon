@@ -47,8 +47,26 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       sepolia: process.env.ETHERSCAN_API_KEY as string,
-      arbitrumSepolia: process.env.ETHERSCAN_API_KEY as string,
+      arbisepolia: process.env.ETHERSCAN_API_KEY as string,
     },
+    customChains: [
+      {
+        network: "arbisepolia",
+        chainId: 421614,
+        urls: {
+          apiURL: "https://sepolia-rollup.arbitrum.io/rpc",
+          browserURL: "https://sepolia.arbiscan.io/",
+        },
+      },
+      {
+        network: "arbigoerli",
+        chainId: 421613,
+        urls: {
+          apiURL: "https://api-goerli.arbiscan.io/api",
+          browserURL: "https://goerli.arbiscan.io/",
+        },
+      },
+    ],
   },
 };
 

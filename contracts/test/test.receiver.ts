@@ -4,8 +4,7 @@ import { ethers } from "hardhat";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
 describe("Lock", function () {
-  let loanCore: any,
-    gho: any,
+  let gho: any,
     cCIP_Receiver: any,
     owner: HardhatEthersSigner,
     user1: HardhatEthersSigner,
