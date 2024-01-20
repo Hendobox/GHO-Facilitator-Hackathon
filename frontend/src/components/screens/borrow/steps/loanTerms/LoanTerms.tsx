@@ -7,6 +7,7 @@ import { ProductType } from "../../Borrow";
 import { Switch } from "@/components/ui/switch";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useAccount } from "wagmi";
+import { calculateInterestRate } from "@/contract/loanHandler";
 
 type NetworkType = 'Sepolia' | 'Arbitrum Sepolia' | "Ethereum" | "Arbitrum";
 const Durations: Record<string, string> = {
@@ -38,10 +39,10 @@ const LoanTerms = ({
     // use toast when rate updates
     const { toast } = useToast();
     const loanAmount = +amount;
-    const interest = interestRate;
+    const interestPct = interestRate;
     const dueDate = "03/28/2024";
+    const interest = `${(interestRate * loanAmount) / 100}`;
     const dueAmount = loanAmount + interest;
-    const interestPct = `${(interest / loanAmount) * 100}%`;
     const apy = 204;
 
     const maxAmount = 1000;
@@ -51,8 +52,14 @@ const LoanTerms = ({
 
     useEffect(() => {
         if (+amount < 0) return;
-        const interestRate = +amount * Math.random();
-        setInterestRate(interestRate);
+
+        (async () => {
+            const interestRate = await calculateInterestRate(account, BigInt(+amount));
+            setInterestRate(interestRate);
+        })().catch((err) => {
+            console.log(err)
+            setInterestRate(10.5)
+        })
 
         if (account?.address) {
             setAddress(account.address)
@@ -174,7 +181,7 @@ const LoanTerms = ({
                                         <span>{loanAmount} GHO</span>
                                     </div>
                                     <div className="flex flex-col justify-between gap-2">
-                                        <span className="text-sm text-zinc-400">Interest {interestPct}</span>
+                                        <span className="text-sm text-zinc-400">Interest {interestPct} %</span>
                                         <span>{interest} GHO</span>
                                     </div>
                                     <div className="flex flex-col justify-between gap-2">
