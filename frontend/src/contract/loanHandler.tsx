@@ -2,11 +2,13 @@
 import { WalletClient } from 'wagmi';
 import LoanCoreArtifact from './abi/unHODL.json';
 import NftArtifact from './abi/NFT.json'
+import GhoArtifact from './abi/GhoToken.json'
 import { publicActions } from 'viem';
 import { LoanData, LoanState, LoanTerms, RepayTerms } from './loanTypes';
 
 const LoanCoreABI = LoanCoreArtifact.abi;
 const NftABI = NftArtifact.abi;
+const GhoTokenABI = GhoArtifact.abi
 
 const unHODLContractAddress = '0x0886073e6c0da2cE601D1eC846cE2B7E0294b91E';
 
@@ -169,6 +171,31 @@ async function repayDebt(
 ) {
 
     const client: WalletClient = await account.connector?.getWalletClient()
+
+    const ghoTokenAddress = await publicActions(client).readContract({
+        address: unHODLContractAddress,
+        abi: LoanCoreABI,
+        functionName: 'GHO',
+        account: client.account.address,
+    }) as `0x${string}`;
+
+    console.log(`GHO Token address: ${ghoTokenAddress}`)
+
+    const ghoHash = await client.writeContract(
+        {
+            address: ghoTokenAddress as `0x${string}`,
+            abi: GhoTokenABI,
+            functionName: 'approve',
+            chain: chain,
+            account: client.account.address,
+            args: [
+                unHODLContractAddress,
+                amount
+            ]
+        }
+    )
+
+    console.log(`GHO approved txn: ${ghoHash}`)
 
     const hash = await client.writeContract(
         {

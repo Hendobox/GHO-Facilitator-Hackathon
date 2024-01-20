@@ -50,7 +50,7 @@ function ActiveLoan({ data }: RepayLoanProps) {
                 { id: chain },
                 {
                     loanId: BigInt(data?.id),
-                    amount: BigInt(amount)
+                    amount: BigInt(amount * (10 ** 18))
                 }
             )
 
