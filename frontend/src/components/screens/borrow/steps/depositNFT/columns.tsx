@@ -40,6 +40,9 @@ export const columns: ColumnDef<InterfaceNFT>[] = [
     {
         accessorKey: "description",
         header: "Description",
+        cell: ({ row }) => {
+            return row.getValue("description") || <span className="opacity-50">No description</span>
+        }
     },
     {
         accessorKey: "price",

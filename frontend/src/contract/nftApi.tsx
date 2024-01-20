@@ -1,3 +1,6 @@
+import { PublicClient } from "wagmi";
+import { GetAccountResult } from "wagmi/actions";
+
 interface NftData {
     tokenId: number,
     balance: number,
@@ -23,7 +26,7 @@ interface NftData {
 //         }
 //     }, [account])
 
-async function fetchNFTsUser(account: any) {
+async function fetchNFTsUser(account: GetAccountResult<PublicClient>) {
     const options = { method: 'GET', headers: { accept: 'application/json' } };
 
     const apiKey = import.meta.env.VITE_ALCHEMY_ID
@@ -34,18 +37,26 @@ async function fetchNFTsUser(account: any) {
     const json = await data.json()
     const nfts = json.ownedNfts
 
-    const nftData: NftData[] = nfts.map((nft:
-        { tokenId: string; balance: any; tokenUri: any; image: { cachedUrl: any; }; tokenType: any; contract: { address: any; name: any; }; description: any; }) => ({
-            tokenId: parseInt(nft.tokenId),
-            balance: parseInt(nft.balance),
-            tokenUri: nft.tokenUri,
-            imageUrl: nft.image.cachedUrl,
-            tokenType: nft.tokenType,
-            contractAddress: nft.contract.address,
-            name: nft.contract.name,
-            description: nft.description,
-            price: parseFloat((5398000000 / (10 ** 19)).toString()),
-        }));
+    const nftData: NftData[] = nfts.map((nft: {
+        tokenId: string,
+        balance: string,
+        tokenUri: string,
+        image: { cachedUrl: string },
+        tokenType: string,
+        contract: { address: string, name: string },
+        description: string
+    }) => ({
+        tokenId: parseInt(nft.tokenId),
+        balance: parseInt(nft.balance),
+        tokenUri: nft.tokenUri,
+        imageUrl: nft.image.cachedUrl,
+        tokenType: nft.tokenType,
+        contractAddress: nft.contract.address,
+        name: nft.contract.name,
+        description: nft.description,
+        price: parseFloat((5398000000 / (10 ** 6)).toString()),
+    })
+    );
 
     return nftData;
 }

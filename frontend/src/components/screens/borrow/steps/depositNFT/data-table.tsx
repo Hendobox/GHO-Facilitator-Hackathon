@@ -14,6 +14,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -42,7 +43,10 @@ export function DataTable<TData, TValue>({
     return (
         <>
             <div>
-                <Table>
+                <Table style={{
+                    borderCollapse: "separate",
+                    borderSpacing: "0 1em",
+                }}>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
@@ -78,11 +82,23 @@ export function DataTable<TData, TValue>({
                                 </TableRow>
                             ))
                         ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
-                                </TableCell>
-                            </TableRow>
+                            <>
+                                {new Array(2).fill(0).map((_, index) => (
+                                    <TableRow key={index}>
+                                        {new Array(4).fill(0).map((_, index) => (
+                                            <TableCell key={index} colSpan={columns.length} className="h-20">
+                                                <div className="flex flex-row justify-start">
+                                                    {flexRender(index === 0 ?
+                                                        <Skeleton className="h-20 w-20 rounded-md" />
+                                                        : index === 3 ?
+                                                            <Skeleton className="h-9 w-14 rounded-sm" />
+                                                            : <Skeleton className="h-6 w-[100px] rounded-sm" />, {})}
+                                                </div>
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </>
                         )}
                     </TableBody>
                 </Table>
