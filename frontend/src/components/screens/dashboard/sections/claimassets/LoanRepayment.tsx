@@ -2,12 +2,12 @@
 
 import Card from "@/components/ui/dashboard/Card";
 import { CSSProperties } from "react";
-import RepayLoan from "../dashboard/datacards/RepayLoan";
+import RepayLoan from "./RepayLoan";
 
 export default function LoanRepaymentSection() {
 
     const layout: CSSProperties = {
-        marginTop: '40px',
+        marginTop: '24px',
         display: 'flex',
         flexDirection: 'column',
         width: '100%'

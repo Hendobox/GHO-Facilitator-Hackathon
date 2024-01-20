@@ -1,10 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { CSSProperties, useState } from "react";
 import LoanRepaymentSection from "./LoanRepayment";
+import { motion } from 'framer-motion';
 
-export default function ClaimAssetsSection() {
+interface ClaimAssetsProps {
+    loanRepayment?: boolean
+}
 
-    const [loanRepay, setLoanRepay] = useState(false);
+export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) {
+
+    const [loanRepay, setLoanRepay] = useState(loanRepayment ?? false);
 
     const layout: CSSProperties = {
         marginTop: '40px',
@@ -38,7 +43,21 @@ export default function ClaimAssetsSection() {
     }
     return (
         <>
-            {loanRepay ? <LoanRepaymentSection /> :
+            {loanRepay ?
+                <div>
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ x: -20 }}
+                        onClick={() => setLoanRepay(false)}
+                        className="flex flex-row items-center gap-2 pt-6"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M10 12L6 8L10 4" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <span>Go back</span>
+                    </motion.button>
+                    <LoanRepaymentSection />
+                </div> :
                 <div style={layout}>
 
                     <div style={headerStyle}>
