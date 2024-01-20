@@ -8,6 +8,7 @@ The following details describe the smart contract architecture of the unHODL pro
 This serves as the foundational protocol, also functioning as a vault in the current stage of development. It encapsulates the logic to be deployed on the source network.
 
 ### Data Structs
+1. #### LoanState Enum
 
 ```solidity
 enum LoanState {
@@ -16,19 +17,37 @@ enum LoanState {
     Repaid,
     Defaulted
 }
+```
+- Enumerates the possible states of a loan.
+- States include "Active" (indicating an ongoing loan), "Repaid" (indicating a fully repaid loan), and "Defaulted" (indicating a loan that has defaulted).
 
-enum Facilitator {
+2. #### Facilitator Enum
+
+```solidity
+enum  Facilitator {
     Native,
     AaveV3
 }
+```
+- Enumerates facilitator options for handling loans.
+- Options include "Native" (for using the native facilitator) and "AaveV3" (for utilizing the AaveV3 facilitator).
 
+3. #### LoanTerms Struct
+
+```solidity
 struct LoanTerms {
     address collateralAddress;
     uint256 collateralId;
     uint256 principal;
     Facilitator facilitator;
 }
+```
+- Defines the terms of a loan, including collateral NFT address, collateral NFT token ID, principal amount of GHO to borrow, and chosen facilitator.
+- 0 = Native facilitator. 1 = Aave V3 facilitator.
+- Provides a structured way to store loan-related information.
 
+4. #### LoanData Struct
+```solidity
 struct LoanData {
     LoanState state;
     uint64 startDate;
@@ -41,23 +60,9 @@ struct LoanData {
     address owner;
 }
 ```
-1. **LoanState Enum:**
-   - Enumerates the possible states of a loan.
-   - States include "Active" (indicating an ongoing loan), "Repaid" (indicating a fully repaid loan), and "Defaulted" (indicating a loan that has defaulted).
-
-2. **Facilitator Enum:**
-   - Enumerates facilitator options for handling loans.
-   - Options include "Native" (for using the native facilitator) and "AaveV3" (for utilizing the AaveV3 facilitator).
-
-3. **LoanTerms Struct:**
-   - Defines the terms of a loan, including collateral NFT address, collateral NFT token ID, principal amount of GHO to borrow, and chosen facilitator.
-   - 0 = Native facilitator. 1 = Aave V3 facilitator.
-   - Provides a structured way to store loan-related information.
-
-4. **LoanData Struct:**
-   - Stores data related to the state and details of a loan.
-   - Includes the loan state, start date, last accrual timestamp, entry price, balance, interest amount paid, allowance, loan terms, and owner address.
-   - Offers a comprehensive representation of the loan's current status and characteristics.
+- Stores data related to the state and details of a loan.
+- Includes the loan state, start date, last accrual timestamp, entry price, balance, interest amount paid, allowance, loan terms, and owner address.
+- Offers a comprehensive representation of the loan's current status and characteristics.
 
 ### Read Methods
 1. #### GHO
@@ -157,3 +162,23 @@ function calculateCollateralValue(uint256 amount, bool withAave) external pure r
 function getLoan(uint256 loanId) external view returns (LoanLibrary.LoanData memory loanData);
 ```
 - returns the **LoanData** struct of the loan with id: **loanId**.
+
+
+### Write Methods
+
+1. #### Start Loan
+This method is used when a holder of a whitelisted NFT wants to supply it as a collateral to borrow GHO.
+```solidity
+function startLoan(LoanTerms calldata terms) external returns (uint256 loanId);
+```
+- check the **LoanTerms** struct for the correct argument format.
+- terms.collateralAddress must be a whitelisted NFT address
+- terms.collateralId must be a token ID owned by the message sender 
+- terms.principal must be *> 0 < calculateCollateralValue(getLatestPrice())*;
+- terms.facilitator must be 0 or 1 for native or Aave v3 facilitators respectively.
+- the message sender must approve the **unHODL** smart contract to be able to spend the NFT from the message sender. 
+- to do this, call the *approve(unHODLContractAddress, terms.collateralId);* method with the given parmeters to approve the unHoDL contract address
+- if terms.facilitator = 0, based on the available tresusry balance of GHO *ghoTreasuryBalance()*, the protocol will send terms.principal to the message sender
+- if terms.facilitator = 1, based on the available tresusry balance of USDC *usdcTreasuryBalance()*, the protocol will engage with Aave and send terms.principal to the message sender
+- The remaining allowance and over collateralized portion, through CCIP, makes a cross-chain investment into Savvy Defi.
+- The message sender's share is recorded in the Reciever contract *receiver()*
