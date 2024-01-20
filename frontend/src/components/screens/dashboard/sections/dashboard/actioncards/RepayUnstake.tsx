@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { Link } from "react-router-dom";
 
 export default function RepayUnstake() {
 
@@ -23,12 +24,12 @@ export default function RepayUnstake() {
             </div >
 
             <Button variant={"outline"} className="
-             w-full mt-9 rounded-md bg-zinc-900 ">
+             w-full mt-9 rounded-md bg-zinc-900 "
+                onClick={() => window.open('/dashboard/repay', "_self")}>
                 <div className="text-sm font-medium font-['Inter'] leading-normal">
                     Withdraw stake
                 </div>
             </Button>
-
         </div >
     )
 }

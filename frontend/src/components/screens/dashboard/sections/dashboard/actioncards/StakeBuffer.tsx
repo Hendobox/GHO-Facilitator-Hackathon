@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { Link } from "react-router-dom"
 
 export default function StakeBuffer() {
     return (
@@ -39,10 +40,14 @@ export default function StakeBuffer() {
                 </div>
             </div >
 
-            <Button variant={"simple"} className="
+            <Link to={"/borrow/stake"}>
+                <Button variant={"simple"} className="
              w-full mt-6 bg-violet-700 rounded-md ">
-                <div className="text-sm font-medium font-['Inter'] leading-normal">Stake buffer</div>
-            </Button>
+                    <div className="text-sm font-medium font-['Inter'] leading-normal">
+                        Stake buffer
+                    </div>
+                </Button>
+            </Link>
 
         </div >
     )

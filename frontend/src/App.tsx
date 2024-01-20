@@ -16,7 +16,9 @@ function App() {
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/borrow" element={<Borrow />} />
+                        <Route path="/borrow/stake" element={<Borrow />} />
                         <Route path="/dashboard" element={<DashboardLayout />} />
+                        <Route path="/dashboard/repay" element={<DashboardLayout repayLoan={true} />} />
                     </Routes>
                 </Router>
                 <Toaster />

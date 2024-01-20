@@ -82,10 +82,6 @@ export default function DashboardSection() {
 
                 </div>
             </div>
-
-            <div className="">
-                <div> Transactions </div>
-            </div>
         </div>
     );
 }
