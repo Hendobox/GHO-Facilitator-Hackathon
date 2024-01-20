@@ -17,7 +17,7 @@ export default function StakeBuffer() {
 
                     <div className="pt-3 pb-3 pl-2 pr-2 bg-zinc-800 rounded justify-center items-center ">
                         <svg width="18" height="13" viewBox="0 0 18 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17 1L6 12L1 7" stroke="#22C55E" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M17 1L6 12L1 7" stroke="#22C55E" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </div>
                     <div className=" text-zinc-400 text-xs font-medium">
@@ -31,7 +31,7 @@ export default function StakeBuffer() {
 
                     <div className="pt-3 pb-3 pl-2 pr-2 bg-zinc-800 rounded justify-center items-center ">
                         <svg width="18" height="13" viewBox="0 0 18 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17 1L6 12L1 7" stroke="#22C55E" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M17 1L6 12L1 7" stroke="#22C55E" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </div>
                     <div className=" text-zinc-400 text-xs font-medium">

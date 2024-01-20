@@ -7,8 +7,13 @@ import { getLoans } from "@/contract/loanHandler";
 import { useAccount } from "wagmi";
 import { LoanData } from "@/contract/loanTypes";
 import { motion } from 'framer-motion';
+import { InterfaceNFT } from "@/components/screens/borrow/steps/depositNFT/columns";
 
-export default function LoanRepaymentSection() {
+export default function LoanRepaymentSection({
+    nft
+}: {
+    nft: InterfaceNFT
+}) {
 
     const layout: CSSProperties = {
         marginTop: '24px',
@@ -58,14 +63,16 @@ export default function LoanRepaymentSection() {
         }
     }
 
-    async function getLoansData() {
-        const loansData = await getLoans(account)
-        setLoans(loansData)
-    }
-
     useEffect(() => {
-        getLoansData()
-    })
+        async function getLoansData() {
+            const loansData = await getLoans(account)
+            setLoans(loansData)
+            console.log("🚀 ~ useEffect ~ loan:", loansData)
+        }
+        if (!loans?.length) {
+            getLoansData()
+        }
+    }, [account, loans?.length])
 
     return (
         <div style={layout}>
@@ -90,8 +97,8 @@ export default function LoanRepaymentSection() {
                     onClick={nextLoan}
                     className="flex flex-row items-center gap-2 pl-5"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="7" height="16" viewBox="0 0 7 16"><path fill="currentColor" d="M1.5 13a.47.47 0 0 1-.35-.15c-.2-.2-.2-.51 0-.71L5.3 7.99L1.15 3.85c-.2-.2-.2-.51 0-.71c.2-.2.51-.2.71 0l4.49 4.51c.2.2.2.51 0 .71l-4.5 4.49c-.1.1-.23.15-.35.15" /></svg>
                     <span>Next Loan</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="7" height="16" viewBox="0 0 7 16"><path fill="currentColor" d="M1.5 13a.47.47 0 0 1-.35-.15c-.2-.2-.2-.51 0-.71L5.3 7.99L1.15 3.85c-.2-.2-.2-.51 0-.71c.2-.2.51-.2.71 0l4.49 4.51c.2.2.2.51 0 .71l-4.5 4.49c-.1.1-.23.15-.35.15" /></svg>
                 </motion.button>
             </div>
 

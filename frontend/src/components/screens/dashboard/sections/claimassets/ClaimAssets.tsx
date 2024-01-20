@@ -4,13 +4,18 @@ import LoanRepaymentSection from "./LoanRepayment";
 import { motion } from 'framer-motion';
 import { useAccount } from "wagmi";
 import { getStakeNFTsUser } from '@/contract/nftApi'
+import { InterfaceNFT } from "@/components/screens/borrow/steps/depositNFT/columns";
+import { DataTable } from "@/components/screens/borrow/steps/depositNFT/data-table";
+import { RowSelectionState } from "@tanstack/react-table";
+import { columns } from "./columns";
 
 interface ClaimAssetsProps {
     loanRepayment?: boolean
 }
 
 export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) {
-
+    const [data, setData] = useState<InterfaceNFT[]>([])
+    const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
     const [loanRepay, setLoanRepay] = useState(loanRepayment ?? false);
 
     const layout: CSSProperties = {
@@ -47,16 +52,16 @@ export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) 
     const account = useAccount()
 
     useEffect(() => {
-        if (account) {
+        if (account && !data.length) {
             (async () => {
                 const nfts = await getStakeNFTsUser(account)
-                console.log(nfts)
+                setData(nfts)
             })()
         }
-    })
+    }, [account, data.length, setData])
     return (
         <>
-            {loanRepay ?
+            {loanRepay || Object.keys(rowSelection).length > 0 ?
                 <div>
                     <motion.button
                         whileHover={{ scale: 1.05 }}
@@ -69,27 +74,36 @@ export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) 
                         </svg>
                         <span>Go back</span>
                     </motion.button>
-                    <LoanRepaymentSection />
+                    <LoanRepaymentSection nft={data.filter((_, index) => rowSelection[index])[0]} />
                 </div> :
-                <div style={layout}>
+                (
+                    <div style={layout}>
 
-                    <div style={headerStyle}>
-                        Claim assets
-                    </div>
-                    <div style={subHeaderBody}>
-                        Claim your assets here
-                    </div>
+                        <div style={headerStyle}>
+                            Claim assets
+                        </div>
+                        <div style={subHeaderBody}>
+                            Claim your assets here
+                        </div>
 
-                    <div style={assetsTable}>
-                        <div> Assets table </div>
-                        <Button
-                            variant="ghost"
-                            onClick={() => setLoanRepay(true)}
-                        >
-                            Loan Repay Button Placeholder
-                        </Button>
+                        <DataTable
+                            columns={columns}
+                            data={data}
+                            rowSelection={rowSelection}
+                            setRowSelection={setRowSelection}
+                        />
+
+                        <div style={assetsTable}>
+                            <div> Assets table </div>
+                            <Button
+                                variant="ghost"
+                                onClick={() => setLoanRepay(true)}
+                            >
+                                Loan Repay Button Placeholder
+                            </Button>
+                        </div>
                     </div>
-                </div>
+                )
             }
         </>
     );

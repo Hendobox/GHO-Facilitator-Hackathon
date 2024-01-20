@@ -1,19 +1,8 @@
+import { InterfaceNFT } from "@/components/screens/borrow/steps/depositNFT/columns"
 import { Button } from "@/components/ui/button"
 import Checks from "@/components/ui/icons/checks"
 import { ColumnDef } from "@tanstack/react-table"
 import { motion } from "framer-motion"
-
-export type InterfaceNFT = {
-    tokenId?: number,
-    balance?: number,
-    tokenUri?: string, //ipfs
-    imageUrl: string, // https
-    tokenType?: string,
-    contractAddress?: string,
-    name?: string,
-    description: string
-    price: string
-}
 
 export const columns: ColumnDef<InterfaceNFT>[] = [
     {
@@ -62,7 +51,7 @@ export const columns: ColumnDef<InterfaceNFT>[] = [
                         variant={row.getIsSelected() ? "disabled" : "ghost"}
                         onClick={() => row.toggleSelected(!row.getIsSelected())}
                     >
-                        {row.getIsSelected() ? <Checks /> : "Add"}
+                        {row.getIsSelected() ? <Checks /> : "Unstake"}
                     </Button>
                 </motion.div>
             )
