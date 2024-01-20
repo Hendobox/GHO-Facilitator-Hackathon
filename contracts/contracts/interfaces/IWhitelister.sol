@@ -15,14 +15,5 @@ interface IWhitelister {
 
     function whitelistNFT(address token, bool whitelist) external;
 
-    function whitelistDestinationChain(
-        uint64 destinationChain,
-        bool whitelist
-    ) external;
-
     function isWhitelistedNFT(address token) external view returns (bool);
-
-    function isWhitelistedDestination(
-        uint64 destinationChain
-    ) external view returns (bool);
 }

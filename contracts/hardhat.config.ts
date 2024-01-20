@@ -1,6 +1,8 @@
 require('dotenv').config({ path: __dirname + '/.env' })
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import dotenv from "dotenv";
+dotenv.config();
 
 const PVT_KEY: string = process.env.PVT_KEY ?? ""
 const ETHERSCAN_API_KEY: string = process.env.ETHERSCAN_API ?? ""
@@ -9,33 +11,51 @@ const ALCHEMY_KEY_ETH: string = process.env.ALCHEMY_KEY_ETH ?? ""
 const ALCHEMY_KEY_ARBI: string = process.env.ALCHEMY_KEY_ARBI ?? ""
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.21",
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.21",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1,
+          },
+        },
+      },
+      {
+        version: "0.7.6",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 0,
+          },
+        },
+      },
+    ],
+  },
+
   networks: {
     hardhat: {
+      forking: {
+        url: "https://sepolia.gateway.tenderly.co",
+        blockNumber: 5071093,
+        // url: "https://sepolia-rollup.arbitrum.io/rpc",
+      },
     },
     sepolia: {
-      url: "https://eth-sepolia.g.alchemy.com/v2/" + ALCHEMY_KEY_ETH,
-      accounts: [PVT_KEY]
-    },
-    goerli: {
-      url: "https://eth-goerli.g.alchemy.com/v2/" + ALCHEMY_KEY_ETH,
-      accounts: [PVT_KEY],
+      url: "https://sepolia.gateway.tenderly.co",
+      accounts: [process.env.PVT_KEY as string],
     },
     arbisepolia: {
-      url: "https://arb-sepolia.g.alchemy.com/v2/" + ALCHEMY_KEY_ARBI,
-      accounts: [PVT_KEY]
-    },
-    arbigoerli: {
-      url: "https://arb-goerli.g.alchemy.com/v2/" + ALCHEMY_KEY_ARBI,
-      accounts: [PVT_KEY]
+      url: "https://sepolia-rollup.arbitrum.io/rpc",
+      accounts: [process.env.PVT_KEY as string],
     },
   },
   etherscan: {
     apiKey: {
-      sepolia: ETHERSCAN_API_KEY,
-      goerli: ETHERSCAN_API_KEY,
-      arbisepolia: ARBISCAN_API_KEY,
+      sepolia: process.env.ETHERSCAN_API_KEY as string,
       arbigoerli: ARBISCAN_API_KEY,
+
     },
     customChains: [
       {
