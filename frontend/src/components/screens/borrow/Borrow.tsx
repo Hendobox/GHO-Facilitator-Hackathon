@@ -69,6 +69,9 @@ export default function Borrow() {
             if (productType === "borrow") {
                 submitLoan()
             }
+            else if (productType == "stake_borrow") {
+                submitLoan()
+            }
         }
         if (newStep > borrowSteps.length - 1) {
             return
