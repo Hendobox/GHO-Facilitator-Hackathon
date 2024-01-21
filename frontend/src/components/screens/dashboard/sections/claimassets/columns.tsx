@@ -33,7 +33,7 @@ export const columns: ColumnDef<InterfaceNFT>[] = [
         cell: ({ row }) => {
             return (
                 <div className="flex items-center">
-                    {row.getValue("price")} ETH
+                    {row.getValue("price")} USDC
                 </div>
             );
         }
@@ -42,9 +42,10 @@ export const columns: ColumnDef<InterfaceNFT>[] = [
         accessorKey: "balance",
         header: "Loan amount",
         cell: ({ row }) => {
+            const balance = BigInt(row.getValue("balance")).toString()
             return (
                 <div className="flex items-center">
-                    {row.getValue("balance")} ETH
+                    {balance} GHO
                 </div>
             );
         }
