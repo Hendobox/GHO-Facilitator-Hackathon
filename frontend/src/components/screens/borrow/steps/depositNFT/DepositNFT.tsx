@@ -8,7 +8,6 @@ import { DataTable } from "./data-table"
 
 async function getData(account: GetAccountResult<PublicClient>): Promise<InterfaceNFT[]> {
     const nfts = await fetchNFTsUser(account)
-    console.log("🚀 ~ getData ~ nfts:", nfts)
     return nfts;
 
     // const nft1 = {
@@ -49,7 +48,7 @@ export default function DepositNFT({
             }
         }
         fetchData()
-    }, [account, data.length])
+    }, [data.length])
 
     const updateSelectedNFTs = useCallback((data: InterfaceNFT[]) => {
         const selectedNFTs = data.filter((_, index) => rowSelection[index])
