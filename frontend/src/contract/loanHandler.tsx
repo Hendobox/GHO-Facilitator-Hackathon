@@ -165,26 +165,26 @@ async function getLoans(account: any): Promise<LoanData[]> {
         owner: loan.owner,
     }));
 
-    if (loansData.length <= 0) {
-        const testLoan: LoanData = {
-            id: 0,
-            allowance: 0n,
-            balance: 10000n,
-            interestAmountPaid: 1000n,
-            owner: "0x8c427C56790f2C36664870a55B3A0189bFf9996d",
-            state: 0,
-            terms: {
-                collateralAddress: "0x86ef4d0470dA8A06F21795055a6b8Bf9BA262059",
-                collateralId: 0n,
-                principal: 1000n,
-                facilitator: 0
-            },
-            entryPrice: 100n,
-            lastAccrualTimestamp: 1000n,
-            startDate: 1000n
-        }
-        return [testLoan]
-    }
+    // if (loansData.length <= 0) {
+    //     const testLoan: LoanData = {
+    //         id: 0,
+    //         allowance: 0n,
+    //         balance: 10000n,
+    //         interestAmountPaid: 1000n,
+    //         owner: "0x8c427C56790f2C36664870a55B3A0189bFf9996d",
+    //         state: 0,
+    //         terms: {
+    //             collateralAddress: "0x86ef4d0470dA8A06F21795055a6b8Bf9BA262059",
+    //             collateralId: 0n,
+    //             principal: 1000n,
+    //             facilitator: 0
+    //         },
+    //         entryPrice: 100n,
+    //         lastAccrualTimestamp: 1000n,
+    //         startDate: 1000n
+    //     }
+    //     return [testLoan]
+    // }
 
     return loansData;
 }

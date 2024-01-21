@@ -5,7 +5,7 @@ export default function RepayKeepStake({
 }: {
     onButtonClick: () => void
 }) {
-    const loanAmount: number = 7412;
+    const loanAmount: number = 1000;
     return (
         <div className="h-full flex flex-col justify-between" >
             <div className="text-sm font-medium mb-4">

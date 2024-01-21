@@ -3,7 +3,7 @@ interface EarningsProps {
 }
 
 export default function Earnings(props: EarningsProps) {
-    const earnings = 7342;
+    const earnings = 500;
     return (
         <>
             <div className="text-sm mb-2 font-['Inter'] font-medium leading-[24px] text-[#a1a1aa]">

@@ -3,7 +3,7 @@ interface TotalStakedProps {
 }
 
 export default function TotalStaked(props: TotalStakedProps) {
-    const stakeAmount: number = 13702;
+    const stakeAmount: number = 15000;
 
     return (
         <>

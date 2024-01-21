@@ -4,7 +4,7 @@ interface LoanAmountProps {
 
 
 export default function LoanAmount(props: LoanAmountProps) {
-    const loanAmount: number = 7412
+    const loanAmount: number = 1000
     return (
         <>
             <div className="text-sm mb-2 font-['Inter'] font-medium leading-[24px] text-[#a1a1aa]">
