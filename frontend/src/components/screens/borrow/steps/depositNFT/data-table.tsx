@@ -104,7 +104,7 @@ export function DataTable<TData, TValue>({
                                 ))
                                     : (
                                         <TableRow>
-                                            No NFTs found
+                                            No NFTs found or Loading NFTs...
                                         </TableRow>
                                     )
                                 }

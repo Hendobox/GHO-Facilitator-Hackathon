@@ -63,14 +63,15 @@ export default function PortfolioSection() {
     }
 
     const account = useAccount()
-    const [ghoBalance, setBalance] = useState(0.0)
+    const [ghoBalance, setBalance] = useState("0.0")
     useEffect(() => {
         if (account) {
             (async () => {
                 const ghoBalance = await getGhoBalance(account)
+                console.log("Portfolio " + ghoBalance)
+                console.log("Converted Gho " + (BigInt(ghoBalance) / BigInt(10 ** 6)).toString())
                 setBalance(
-                    parseFloat(parseFloat((BigInt(ghoBalance) / BigInt(10 ** 18)).toString())
-                        .toFixed(2))
+                    (parseFloat(ghoBalance.toString()) / (10 ** 6)).toString()
                 )
             })()
         }
@@ -89,7 +90,7 @@ export default function PortfolioSection() {
             <div style={availableHeaderBody}>
                 <div>
                     <div style={availableText} >Available</div>
-                    <div style={ghoText}>{ghoBalance.toLocaleString('en-IN')} GHO</div>
+                    <div style={ghoText}>{ghoBalance} GHO</div>
                 </div>
             </div>
 
