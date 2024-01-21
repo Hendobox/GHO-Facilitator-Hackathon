@@ -112,7 +112,9 @@ contract unHODL is
         );
         if (collateralInUse[collateralKey]) revert Collateral_In_Use();
 
-        uint256 floorPriceUSD = uint256(ChainlinkDataLib.getLatestPrice());
+        uint256 floorPriceUSD = uint256(
+            ChainlinkDataLib.getLatestPrice() * 10e11
+        );
         uint256 maxBorrowable = calculateCollateralValue(floorPriceUSD, true);
 
         if (terms.principal > maxBorrowable)
@@ -132,6 +134,58 @@ contract unHODL is
             loanIdTracker++;
         }
 
+        uint256 availableBorrowsBase;
+        uint256 amountOverCollateralized;
+        uint256 max;
+
+        if (terms.facilitator == LoanLibrary.Facilitator.Native) {
+            _nativeFacilitator(terms.principal);
+            availableBorrowsBase = calculateCollateralValue(
+                floorPriceUSD,
+                false
+            );
+            amountOverCollateralized = availableBorrowsBase - maxBorrowable;
+            max = maxBorrowable;
+        } else {
+            uint256 floorPriceUsdAave = floorPriceUSD / 10e11;
+            uint256 maxBorrowableAave = maxBorrowable / 10e11;
+            // create the approval to aave pool
+            USDC.approve(
+                address(AaveFacilitatorLib.aaveV3Pool),
+                floorPriceUsdAave
+            );
+
+            usdcTreasuryBalance -= maxBorrowableAave;
+
+            // supply the USDC asset to Aave
+            AaveFacilitatorLib.supplyAaveUSDC(
+                address(USDC),
+                floorPriceUsdAave,
+                address(this)
+            );
+
+            (, , availableBorrowsBase, , , ) = AaveFacilitatorLib
+                .getUserAccountData(address(this));
+
+            console.log("availableBorrowsBase: ", availableBorrowsBase / 10e8);
+            console.log("maxBorrowable", maxBorrowable);
+            console.log("maxBorrowableAave", maxBorrowableAave);
+
+            if (availableBorrowsBase > maxBorrowableAave) {
+                // Borrow GHO from Aave
+                AaveFacilitatorLib.borrowAaveGHO(
+                    address(GHO),
+                    maxBorrowable,
+                    address(this)
+                );
+            } else {
+                revert Margin_Error(); // our 30% collateral will cover for Aave's 20%. this is assumint the rates do not change
+            }
+
+            amountOverCollateralized = availableBorrowsBase - maxBorrowableAave;
+            max = availableBorrowsBase;
+        }
+
         // Initiate loan state
         loans[loanId] = LoanLibrary.LoanData({
             state: LoanLibrary.LoanState.Active,
@@ -145,53 +199,12 @@ contract unHODL is
             owner: msg.sender
         });
 
-        uint256 availableBorrowsBase;
-
-        if (terms.facilitator == LoanLibrary.Facilitator.Native) {
-            _nativeFacilitator(terms.principal);
-            availableBorrowsBase = calculateCollateralValue(
-                floorPriceUSD,
-                false
-            );
-        } else {
-            // create the approval to aave pool
-            USDC.approve(address(AaveFacilitatorLib.aaveV3Pool), floorPriceUSD);
-
-            // supply the USDC asset to Aave
-            AaveFacilitatorLib.supplyAaveUSDC(
-                address(USDC),
-                floorPriceUSD,
-                address(this)
-            );
-
-            usdcTreasuryBalance -= maxBorrowable;
-
-            (, , availableBorrowsBase, , , ) = AaveFacilitatorLib
-                .getUserAccountData(address(this));
-
-            // console.log("availableBorrowsBase: ", availableBorrowsBase);
-
-            if (availableBorrowsBase > maxBorrowable) {
-                // Borrow GHO from Aave
-                AaveFacilitatorLib.borrowAaveGHO(
-                    address(GHO),
-                    availableBorrowsBase,
-                    address(this)
-                );
-            } else {
-                revert Margin_Error(); // our 30% collateral will cover for Aave's 20%. this is assumint the rates do not change
-            }
-        }
-
         // send GHO to the borrower
 
         if (terms.principal > 0) {
             GHO.safeTransfer(msg.sender, terms.principal);
         }
 
-        // evaluate available GHO for secondary pool in cross-chain with CCIP
-
-        uint256 amountOverCollateralized = availableBorrowsBase - maxBorrowable;
         uint256 userBal = maxBorrowable - terms.principal;
 
         // enter Savvy for risk management revenue
@@ -344,9 +357,11 @@ contract unHODL is
             uint256 timeSinceLastPayment = block.timestamp -
                 loanData.lastAccrualTimestamp;
 
+            timeSinceLastPayment /= 1 days;
+
             interestAmountDue =
                 (loanData.balance * timeSinceLastPayment * interestRate) /
-                (BASIS_POINTS_DENOMINATOR * 365 days);
+                (BASIS_POINTS_DENOMINATOR * 365);
         }
     }
 

@@ -19,6 +19,8 @@ contract CCIP_Receiver is Ownable, CCIPReceiver {
 
     mapping(address => uint256) public shares;
 
+    receive() external payable {}
+
     event MessageReceived(
         bytes32 indexed latestMessageId,
         uint256 amount,
@@ -125,8 +127,15 @@ contract CCIP_Receiver is Ownable, CCIPReceiver {
     // to recover assets from demo contract to final version
     function drain(address to) external onlyOwner {
         uint256 ghoBalance = IERC20(gho).balanceOf(address(this));
+        uint256 ethBalance = address(this).balance;
+
         if (ghoBalance > 0) {
             IERC20(gho).safeTransfer(to, ghoBalance);
+        }
+
+        if (ethBalance > 0) {
+            (bool success, ) = payable(to).call{value: ethBalance}("");
+            require(success, "ETH sending failed");
         }
     }
 }
