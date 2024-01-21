@@ -43,6 +43,7 @@ async function fetchNFTsUser(account: GetAccountResult<PublicClient>) {
         tokenId: string,
         balance: string,
         tokenUri: string,
+        name: string,
         image: { cachedUrl: string },
         tokenType: string,
         contract: { address: string, name: string },
@@ -54,7 +55,7 @@ async function fetchNFTsUser(account: GetAccountResult<PublicClient>) {
         imageUrl: nft.image.cachedUrl,
         tokenType: nft.tokenType,
         contractAddress: nft.contract.address,
-        name: nft.contract.name,
+        name: nft.name,
         description: nft.description,
         price: parseFloat((5398000000 / (10 ** 6)).toString()),
     })
