@@ -6,7 +6,7 @@ async function main() {
   const atoken = "0x16dA4541aD1807f4443d92D26044C1147406EB80";
   const ghoToken = "0xc4bF5CbDaBE595361438F8c6a187bDc330539c60";
   const ccipRouterSepolia = "0x0BF3dE8c5D3e8A2B34D2BEeB17ABfCeBaf363A59";
-  const receiverProtocol = "0x238C700e008CC4A8Bf5D2c6B1257879d563Ba71e";
+  const receiverProtocol = "0xb62515640d02c6f82EE13B8CB262c45708aa60D5";
 
   // // deploy mock crypto punk
   // const nft = await ethers.deployContract("MockERC721", [
@@ -17,7 +17,7 @@ async function main() {
   // await nft.waitForDeployment();
   // console.log(`NFT (Crypto Punk mock) deployed to ${nft.target}`);
 
-  // Deploy libraries
+  // // Deploy libraries
   // const ChainlinkDataLib = await ethers.getContractFactory("ChainlinkDataLib");
   // const chainlinkDataLib = await ChainlinkDataLib.deploy({
   //   gasPrice: ethers.parseUnits("62", "gwei"),
@@ -28,7 +28,7 @@ async function main() {
   //   "AaveFacilitatorLib"
   // );
   // const aaveFacilitatorLib = await AaveFacilitatorLib.deploy({
-  //   gasPrice: ethers.parseUnits("63", "gwei"),
+  //   gasPrice: ethers.parseUnits("83", "gwei"),
   // });
   // console.log(`aaveFacilitatorLib deployed to ${aaveFacilitatorLib.target}`);
 
@@ -47,8 +47,8 @@ async function main() {
     ], // arbitrum-sepolia chain selector
     {
       libraries: {
-        ChainlinkDataLib: "0x74B72F7aCFDCa6ce410FBf839b970749C23c5381",
-        AaveFacilitatorLib: "0xb62515640d02c6f82EE13B8CB262c45708aa60D5",
+        ChainlinkDataLib: "0xC61F0EaF0CDfbb9cee9Bfd47c56A49E75359FD40",
+        AaveFacilitatorLib: "0x226586FeD6E9eeb07A6f9c70E5e9887dd317d307",
       },
     }
   );
@@ -64,4 +64,4 @@ main().catch((error) => {
 });
 
 // NFT (Crypto Punk mock) deployed to 0x8c427C56790f2C36664870a55B3A0189bFf9996d
-// unHODL deployed to 0x0886073e6c0da2cE601D1eC846cE2B7E0294b91E
+// unHODL deployed to 0xD7aD2DEf2A84006C7ABbF04794997E206856614f

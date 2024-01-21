@@ -25,6 +25,8 @@ contract CCIP_Receiver is Ownable, CCIPReceiver {
         address indexed recipient
     );
 
+    receive() external payable {}
+
     constructor(
         address router,
         address gho_,
