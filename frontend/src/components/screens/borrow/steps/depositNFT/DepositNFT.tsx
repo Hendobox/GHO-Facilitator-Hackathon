@@ -32,15 +32,20 @@ export default function DepositNFT({
 }) {
     const account = useAccount()
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+    const [isLoading, setIsLoading] = useState<boolean>(true)
     const [data, setData] = useState<InterfaceNFT[]>([])
 
 
     useEffect(() => {
         const fetchData = async () => {
             if (account && !data.length) {
-                const fetchedData = await getData(account)
-                console.log("🚀 ~ fetchData ~ fetchedData:", fetchedData)
-                setData(fetchedData)
+                try {
+                    const fetchedData = await getData(account)
+                    setData(fetchedData)
+                    setIsLoading(false)
+                } catch (error) {
+                    setIsLoading(false)
+                }
             }
         }
         fetchData()
@@ -64,6 +69,7 @@ export default function DepositNFT({
                 data={data}
                 rowSelection={rowSelection}
                 setRowSelection={setRowSelection}
+                isLoading={isLoading}
             />
         </div>
     )
