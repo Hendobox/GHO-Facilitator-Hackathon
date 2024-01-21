@@ -71,11 +71,10 @@ export default function Borrow() {
         const newStep = step + 1
 
         if (newStep == borrowSteps.length) {
+            setIsButtonLoading(true)
             if (productType === "borrow") {
-                setIsButtonLoading(true)
                 submitLoan()
-            }
-            else if (productType == "stake_borrow") {
+            } else if (productType == "stake_borrow") {
                 submitLoan()
             }
         }
