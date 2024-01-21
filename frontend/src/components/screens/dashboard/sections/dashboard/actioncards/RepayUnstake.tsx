@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button"
 
-export default function RepayUnstake() {
+export default function RepayUnstake({
+    onButtonClick
+}: {
+    onButtonClick: () => void
+}) {
 
     const loanAmount: number = 7412;
     return (
@@ -22,9 +26,8 @@ export default function RepayUnstake() {
                 </div>
             </div >
 
-            <Button variant={"outline"} className="
-             w-full mt-9 rounded-md bg-zinc-900 "
-                onClick={() => window.open('/dashboard/repay', "_self")}>
+            <Button variant={"outline"} className="w-full mt-9 rounded-md bg-zinc-900"
+                onClick={onButtonClick}>
                 <div className="text-sm font-medium font-['Inter'] leading-normal">
                     Withdraw stake
                 </div>

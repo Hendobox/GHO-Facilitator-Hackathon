@@ -25,7 +25,7 @@ export default function DashboardLayout({ repayLoan }: DashboardProps) {
             {/* vertical white line */}
             <div className='ml-6 mr-10 h-[calc(100vh-105px)] border-r-[1px] border-[#3F3F46]' />
 
-            {selectedItem === DashboardSections.Dashboard && <DashboardSection />}
+            {selectedItem === DashboardSections.Dashboard && <DashboardSection setSelectedItem={setSelectedItem} />}
             {selectedItem === DashboardSections.ClaimAssets && <ClaimAssetsSection loanRepayment={repayLoan} />}
             {selectedItem === DashboardSections.Portfolio && <PortfolioSection />}
         </div>

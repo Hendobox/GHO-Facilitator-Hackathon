@@ -9,8 +9,13 @@ import AvailableBuffer from "./datacards/AvailableBuffer";
 import StakeBuffer from "./actioncards/StakeBuffer";
 import RepayKeepStake from "./actioncards/RepayKeepStake";
 import RepayUnstake from "./actioncards/RepayUnstake";
+import { DashboardSections } from "../../types";
 
-export default function DashboardSection() {
+export default function DashboardSection({
+    setSelectedItem
+}: {
+    setSelectedItem: (_: DashboardSections) => void
+}) {
 
     const layout: CSSProperties = {
         marginTop: '40px',
@@ -71,13 +76,13 @@ export default function DashboardSection() {
                     <div className="w-4" />
 
                     <Card height="304px" width="308px" >
-                        <RepayKeepStake />
+                        <RepayKeepStake onButtonClick={() => setSelectedItem(DashboardSections.ClaimAssets)} />
                     </Card>
 
                     <div className="w-4" />
 
                     <Card height="304px" width="308px" >
-                        <RepayUnstake />
+                        <RepayUnstake onButtonClick={() => setSelectedItem(DashboardSections.ClaimAssets)} />
                     </Card>
 
                 </div>

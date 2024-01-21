@@ -21,12 +21,12 @@ export default function NavBar() {
                         </motion.svg>
                     </Link>
                 </li>
-                <motion.li
+                {isConnected && <motion.li
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.8 }}
                 >
                     <Link to={"/borrow"}>Borrow</Link>
-                </motion.li>
+                </motion.li>}
             </ul>
             {
                 location.pathname === "/" ?
@@ -45,12 +45,14 @@ export default function NavBar() {
                     <div
                         className="flex flex-row justify-between items-center gap-4"
                     >
-                        <motion.div
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.8 }}
-                        >
-                            <Link to={"/dashboard"}>Dashboard</Link>
-                        </motion.div>
+                        {isConnected &&
+                            <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.8 }}
+                            >
+                                <Link to={"/dashboard"}>Dashboard</Link>
+                            </motion.div>
+                        }
                         <ConnectKitButton />
                     </div>
             }
