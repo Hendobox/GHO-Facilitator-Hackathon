@@ -75,6 +75,9 @@ export default function Borrow() {
                 setIsButtonLoading(true)
                 submitLoan()
             }
+            else if (productType == "stake_borrow") {
+                submitLoan()
+            }
         }
         if (newStep > borrowSteps.length - 1) {
             return
