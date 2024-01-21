@@ -9,7 +9,7 @@ import DashboardLayout from "./components/screens/dashboard/Layout"
 function App() {
 
     return (
-        <div className="bg-zinc-900 h-screen">
+        <div className="bg-zinc-900 min-h-screen">
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
                 <Router>
                     <NavBar />
