@@ -57,7 +57,7 @@ async function fetchNFTsUser(account: GetAccountResult<PublicClient>) {
         contractAddress: nft.contract.address,
         name: nft.name,
         description: nft.description,
-        price: parseFloat((5398000000 / (10 ** 6)).toString()),
+        price: parseFloat(((5398000000 / (10 ** 6)) * Math.random()).toFixed(2)),
     })
     );
 
