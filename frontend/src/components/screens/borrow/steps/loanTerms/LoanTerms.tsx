@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useAccount } from "wagmi";
 import { calculateInterestRate } from "@/contract/loanHandler";
+import { InterfaceNFT } from "../depositNFT/columns";
 
 type NetworkType = 'Sepolia' | 'Arbitrum Sepolia' | "Ethereum" | "Arbitrum";
 const Durations: Record<string, string> = {
@@ -23,10 +24,12 @@ const Durations: Record<string, string> = {
 }
 
 const LoanTerms = ({
+    selectedNFT,
     chosenProduct,
     setProductType,
     setLoanAmount
 }: {
+    selectedNFT: InterfaceNFT,
     chosenProduct: ProductType,
     setProductType: (product: ProductType) => void
     setLoanAmount: (loanAmount: number) => void
@@ -50,7 +53,7 @@ const LoanTerms = ({
     const displayEarnings = isNaN(earnings) || !isFinite(earnings) ? 'N/A' : `${earnings.toFixed(2)} GHO`;
 
 
-    const maxAmount = 1000;
+    const maxAmount = (+selectedNFT.price * 0.7).toFixed(2);
 
     const account = useAccount()
 
@@ -183,11 +186,11 @@ const LoanTerms = ({
                                 <div className="flex flex-row justify-between mt-2">
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Loan amount</span>
-                                        <span>{amount || 0} GHO</span>
+                                        <span>{(+amount).toFixed(2) || 0} GHO</span>
                                     </div>
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Interest {interestPct} %</span>
-                                        <span>{interest} GHO</span>
+                                        <span>{(+interest).toFixed(2)} GHO</span>
                                     </div>
                                     {chosenProduct !== "borrow" && <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Due date</span>
@@ -195,7 +198,7 @@ const LoanTerms = ({
                                     </div>}
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Due amount</span>
-                                        <span>{dueAmount} GHO</span>
+                                        <span>{dueAmount.toFixed(2)} GHO</span>
                                     </div>
                                 </div>
                             </AccordionContent>

@@ -10,12 +10,15 @@ import ChooseProduct from "./steps/chooseProduct/ChooseProduct"
 import { useAccount } from "wagmi"
 import { startLoan } from "@/contract/loanHandler"
 import { useToast } from "@/components/ui/use-toast"
+import { useNavigate } from "react-router-dom"
 
 export type ProductType = "stake" | "borrow" | "stake_borrow"
 
 export default function Borrow() {
     const [step, setStep] = useState(0)
+    const navigate = useNavigate();
     const [selectedNFTs, setSelectedNFTs] = useState<InterfaceNFT[]>([])
+    const [isButtonLoading, setIsButtonLoading] = useState(false)
     const [productType, setProductType] = useState<ProductType>("stake")
     const [loanAmount, setLoanAmount] = useState(0)
     const account = useAccount()
@@ -46,6 +49,8 @@ export default function Borrow() {
             description: `${hash}%`,
             variant: "ghost"
         });
+        setIsButtonLoading(false)
+        navigate("/dashboard")
     }
 
     const handleNextStep = () => {
@@ -67,6 +72,7 @@ export default function Borrow() {
 
         if (newStep == borrowSteps.length) {
             if (productType === "borrow") {
+                setIsButtonLoading(true)
                 submitLoan()
             }
         }
@@ -95,6 +101,7 @@ export default function Borrow() {
                 }} />
             case 2:
                 return <LoanTerms
+                    selectedNFT={selectedNFTs[0]}
                     chosenProduct={productType}
                     setProductType={setProductType}
                     setLoanAmount={setLoanAmount}
@@ -124,7 +131,7 @@ export default function Borrow() {
                 <BorrowHeader step={step} productType={productType} />
                 {renderScreen()}
             </div>
-            <NavigationButtons handlePreviousStep={handlePreviousStep} handleNextStep={handleNextStep} noNextButton={step === 1} />
+            <NavigationButtons handlePreviousStep={handlePreviousStep} handleNextStep={handleNextStep} noNextButton={step === 1} isButtonLoading={isButtonLoading} />
         </div>
     )
 }
