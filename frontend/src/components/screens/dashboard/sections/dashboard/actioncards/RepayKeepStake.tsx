@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button"
 
-export default function RepayKeepStake() {
-    const loanAmount: number = 7412;
+export default function RepayKeepStake({
+    onButtonClick
+}: {
+    onButtonClick: () => void
+}) {
+    const loanAmount: number = 1000;
     return (
         <div className="h-full flex flex-col justify-between" >
             <div className="text-sm font-medium mb-4">
@@ -21,8 +25,8 @@ export default function RepayKeepStake() {
                 </div>
             </div >
 
-            <Button variant={"outline"} className="
-             w-full mt-9 rounded-md bg-zinc-900 ">
+            <Button variant={"outline"} className="w-full mt-9 rounded-md bg-zinc-900"
+                onClick={onButtonClick}>
                 <div className="text-sm font-medium font-['Inter'] leading-normal">
                     Repay and keep stake
                 </div>

@@ -6,8 +6,11 @@ import { useEffect, useState } from 'react';
 import { ProductType } from "../../Borrow";
 import { Switch } from "@/components/ui/switch";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useAccount } from "wagmi";
+import { calculateInterestRate } from "@/contract/loanHandler";
+import { InterfaceNFT } from "../depositNFT/columns";
 
-type NetworkType = 'ETH' | 'BSC';
+type NetworkType = 'Sepolia' | 'Arbitrum Sepolia' | "Ethereum" | "Arbitrum";
 const Durations: Record<string, string> = {
     "7": "1 week",
     "14": "2 weeks",
@@ -21,34 +24,56 @@ const Durations: Record<string, string> = {
 }
 
 const LoanTerms = ({
+    selectedNFT,
     chosenProduct,
-    setProductType
+    setProductType,
+    setLoanAmount
 }: {
+    selectedNFT: InterfaceNFT,
     chosenProduct: ProductType,
     setProductType: (product: ProductType) => void
+    setLoanAmount: (loanAmount: number) => void
 }) => {
     const [amount, setAmount] = useState<string>('');
     const [address, setAddress] = useState<string>('');
-    const [duration, setDuration] = useState<string>('');
-    const [network, setNetwork] = useState<NetworkType>('ETH');
+    const [duration, setDuration] = useState<string>('30');
+    const [network, setNetwork] = useState<NetworkType>('Sepolia');
     const [interestRate, setInterestRate] = useState<number>(0);
-    // use toast when rate updates
     const { toast } = useToast();
-    const loanAmount = +amount;
-    const interest = interestRate;
-    const dueDate = "03/28/2024";
-    const dueAmount = loanAmount + interest;
-    const interestPct = `${(interest / loanAmount) * 100}%`;
-    const apy = 204;
+    const interestPct = interestRate;
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + parseInt(duration));
+    const formattedDueDate = dueDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    const interest = `${(interestRate * +amount) / 100}`;
+    const dueAmount = +amount + +interest;
+    const apy = ((interestRate / +amount) * +duration * 8);
+    const displayApy = isNaN(apy) || !isFinite(apy) ? '12.4%' : `${apy.toFixed(2)}%`;
 
-    const maxAmount = 1000;
-    console.log("🚀 ~ LoanTerms ~ network:", network)
+    const earnings = (+amount * (apy / 100)) * (+duration / 365);
+    const displayEarnings = isNaN(earnings) || !isFinite(earnings) ? 'N/A' : `${earnings.toFixed(2)} GHO`;
+
+
+    const maxAmount = (+selectedNFT.price * 0.7).toFixed(2);
+
+    const account = useAccount()
 
     useEffect(() => {
         if (+amount < 0) return;
-        const interestRate = +amount * Math.random();
-        setInterestRate(interestRate);
-    }, [amount]);
+
+        (async () => {
+            const interestRate = await calculateInterestRate(account, BigInt(+amount));
+            setInterestRate(interestRate);
+        })().catch((err) => {
+            console.log(err)
+            setInterestRate(10.5)
+        })
+
+        if (account?.address) {
+            setAddress(account.address)
+        }
+
+    }, [account, amount]);
+
 
     return (
         <div className="flex flex-row justify-between gap-10">
@@ -73,15 +98,21 @@ const LoanTerms = ({
                         <CustomInput
                             label="Loan amount in GHO"
                             value={amount}
-                            onChange={setAmount}
+                            onChange={(value) => {
+                                setAmount(value)
+                                setLoanAmount(parseFloat(value))
+                            }}
                             placeholder="0.0"
-                            subtext="Amount cannot exceed xx.yy GHO"
+                            subtext={<span>Amount cannot exceed <b>{maxAmount}</b> GHO</span>}
                             icon="document"
                             actionElement={
                                 <Button
                                     variant="simple"
                                     className="h-full text-[#D97706]"
-                                    onClick={() => setAmount(`${maxAmount}`)}
+                                    onClick={() => {
+                                        setAmount(`${maxAmount}`)
+                                        setLoanAmount(parseFloat(maxAmount.toString()))
+                                    }}
                                 >
                                     MAX
                                 </Button>
@@ -94,17 +125,19 @@ const LoanTerms = ({
                             placeholder="Address"
                             icon="document"
                             actionElement={
-                                <Select
+                                <Select defaultValue={network}
                                     onValueChange={(e: NetworkType) => {
                                         setNetwork(e);
                                     }}
                                 >
                                     <SelectTrigger className="h-full border-none bg-zinc-700">
-                                        <SelectValue placeholder="Network" />
+                                        <SelectValue placeholder={network} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-zinc-700 text-white border-none">
-                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="ETH">ETH</SelectItem>
-                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="BSC">BSC</SelectItem>
+                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="Sepolia">Sepolia</SelectItem>
+                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="Arbitrum Sepolia">Arbitrum Sepolia</SelectItem>
+                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="Ethereum">Ethereum</SelectItem>
+                                        <SelectItem className="text-zinc-200 focus:bg-zinc-500 focus:text-white" value="Arbitrum">Arbitrum</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -126,6 +159,7 @@ const LoanTerms = ({
                                     toast({
                                         title: "Interest rate updated",
                                         description: `Interest rate updated to ${interestRate}%`,
+                                        variant: "ghost"
                                     });
                                 }}
                             >
@@ -152,19 +186,19 @@ const LoanTerms = ({
                                 <div className="flex flex-row justify-between mt-2">
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Loan amount</span>
-                                        <span>{loanAmount} GHO</span>
+                                        <span>{(+amount).toFixed(2) || 0} GHO</span>
                                     </div>
                                     <div className="flex flex-col justify-between gap-2">
-                                        <span className="text-sm text-zinc-400">Interest {interestPct}</span>
-                                        <span>{interest} GHO</span>
+                                        <span className="text-sm text-zinc-400">Interest {interestPct} %</span>
+                                        <span>{(+interest).toFixed(2)} GHO</span>
                                     </div>
-                                    <div className="flex flex-col justify-between gap-2">
+                                    {chosenProduct !== "borrow" && <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Due date</span>
-                                        <span>{dueDate}</span>
-                                    </div>
+                                        <span>{formattedDueDate.toString()}</span>
+                                    </div>}
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Due amount</span>
-                                        <span>{dueAmount} GHO</span>
+                                        <span>{dueAmount.toFixed(2)} GHO</span>
                                     </div>
                                 </div>
                             </AccordionContent>
@@ -179,15 +213,15 @@ const LoanTerms = ({
                                 <div className="flex flex-row justify-between mt-2">
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Duration</span>
-                                        <span>{duration} days</span>
+                                        <span>{duration || 0} days</span>
                                     </div>
                                     <div className="flex flex-col justify-between gap-2">
-                                        <span className="text-sm text-zinc-400">APY (3.4%)</span>
-                                        <span>{apy} GHO</span>
+                                        <span className="text-sm text-zinc-400">APY (%)</span>
+                                        <span>{displayApy}</span>
                                     </div>
                                     <div className="flex flex-col justify-between gap-2">
                                         <span className="text-sm text-zinc-400">Total earnings</span>
-                                        <span>324,342 GHO</span>
+                                        <span>{displayEarnings}</span>
                                     </div>
                                 </div>
                             </AccordionContent>

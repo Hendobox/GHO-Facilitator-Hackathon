@@ -9,14 +9,16 @@ import DashboardLayout from "./components/screens/dashboard/Layout"
 function App() {
 
     return (
-        <div className="bg-zinc-900 h-screen">
+        <div className="bg-zinc-900 min-h-screen">
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
                 <Router>
                     <NavBar />
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/borrow" element={<Borrow />} />
+                        <Route path="/borrow/stake" element={<Borrow />} />
                         <Route path="/dashboard" element={<DashboardLayout />} />
+                        <Route path="/dashboard/repay" element={<DashboardLayout repayLoan={true} />} />
                     </Routes>
                 </Router>
                 <Toaster />

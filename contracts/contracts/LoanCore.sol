@@ -29,7 +29,6 @@ contract unHODL is
     IERC20 public GHO;
     IERC20 public aTokenUSDC;
     address public receiver;
-    address public destinationGHO;
     uint256 private constant BASIS_POINTS_DENOMINATOR = 1e4;
     uint256 public loanIdTracker;
     uint256 public interestRate = 1e3; // 10.00 %

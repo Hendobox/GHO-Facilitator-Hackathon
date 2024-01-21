@@ -1,13 +1,13 @@
 
 
 import { AccordionCard } from "@/components/ui/dashboard/AccordionCard";
-import { CSSProperties } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import StakeAccordionCard from "./accordioncards/StakeAccordionCard";
 import WithdrawAccordionCard from "./accordioncards/WithDrawAccordionCard";
+import { useAccount } from "wagmi";
+import { getGhoBalance } from "@/contract/loanHandler"
 
 export default function PortfolioSection() {
-
-    const ghoBalance: number = 1702;
 
     const layout: CSSProperties = {
         marginTop: '40px',
@@ -62,6 +62,21 @@ export default function PortfolioSection() {
         textAlign: "right",
     }
 
+    const account = useAccount()
+    const [ghoBalance, setBalance] = useState("0.0")
+    useEffect(() => {
+        if (account) {
+            (async () => {
+                const ghoBalance = await getGhoBalance(account)
+                console.log("Portfolio " + ghoBalance)
+                console.log("Converted Gho " + (BigInt(ghoBalance) / BigInt(10 ** 6)).toString())
+                setBalance(
+                    (parseFloat(ghoBalance.toString()) / (10 ** 6)).toString()
+                )
+            })()
+        }
+    })
+
     return (
         <div style={layout}>
 
@@ -75,15 +90,15 @@ export default function PortfolioSection() {
             <div style={availableHeaderBody}>
                 <div>
                     <div style={availableText} >Available</div>
-                    <div style={ghoText}>{ghoBalance.toLocaleString('en-IN')} GHO</div>
+                    <div style={ghoText}>{ghoBalance} GHO</div>
                 </div>
             </div>
 
-            <div className="m-10" >
+            <div className="my-10" >
                 <AccordionCard title="Stake">
                     <StakeAccordionCard />
                 </AccordionCard>
-                <div className="mt-10" />
+                <div className="mt-6" />
                 <AccordionCard title="Withdraw">
                     <WithdrawAccordionCard />
                 </AccordionCard>

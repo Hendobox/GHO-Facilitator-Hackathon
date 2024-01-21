@@ -10,7 +10,7 @@ import { ProductType } from "../../Borrow";
 
 interface LoanSummaryProps {
     chosenProduct: ProductType;
-    selectedNFTs: InterfaceNFT[];
+    selectedNFT: InterfaceNFT;
     receiverAddress: string;
     loanAmount: number;
     interest: number;
@@ -23,7 +23,8 @@ interface LoanSummaryProps {
 }
 
 const LoanSummary: React.FC<LoanSummaryProps> = ({
-    selectedNFTs,
+    chosenProduct,
+    selectedNFT,
     receiverAddress,
     loanAmount,
     interest,
@@ -34,22 +35,22 @@ const LoanSummary: React.FC<LoanSummaryProps> = ({
     stakingPeriod,
     interestSaved,
 }) => {
-    const nft = selectedNFTs[0];
+    const nft = selectedNFT
     return (
         <div className="flex flex-row gap-10">
             <div className="flex flex-col gap-6">
-                <img className="rounded-[8px]" src={nft.imageUrl} alt={nft.description} />
+                <img className="rounded-[8px] max-w-[400px] max-h-[400px]" src={nft.imageUrl} alt={nft.description} />
                 <div className="flex flex-row justify-between">
                     <div className="flex flex-col">
                         <span className="text-sm text-zinc-400">Asset</span>
-                        <span>{nft.description}</span>
+                        <span>{"# " + nft.tokenId}</span>
                     </div>
                     <div className="flex flex-col">
                         <span className="text-sm text-zinc-400">Floor price</span>
                         <span>{nft.price} WETH</span>
                     </div>
                 </div>
-                <span className="text-sm">{receiverAddress}</span>
+                <span className="text-sm">{nft.contractAddress}</span>
             </div>
             <div className="flex flex-col w-full gap-6">
                 <div className="flex flex-col gap-3">
@@ -57,7 +58,7 @@ const LoanSummary: React.FC<LoanSummaryProps> = ({
                     <span className="mt-5 text-sm text-zinc-400">Receiver address</span>
                     <span>{receiverAddress}</span>
                 </div>
-                <Accordion defaultValue="item-1" type="single" className="px-6 border-[1px] rounded-[8px] border-zinc-700">
+                {chosenProduct !== "stake" && <Accordion defaultValue="item-1" type="single" className="px-6 border-[1px] rounded-[8px] border-zinc-700">
                     <AccordionItem value="item-1">
                         <AccordionTrigger>Loan Information</AccordionTrigger>
                         <AccordionContent>
@@ -82,7 +83,8 @@ const LoanSummary: React.FC<LoanSummaryProps> = ({
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
-                <Accordion defaultValue="item-2" type="single" className="px-6 border-[1px] rounded-[8px] border-zinc-700">
+                }
+                {chosenProduct !== "borrow" && <Accordion defaultValue="item-2" type="single" className="px-6 border-[1px] rounded-[8px] border-zinc-700">
                     <AccordionItem value="item-2">
                         <AccordionTrigger>Stake Information</AccordionTrigger>
                         <AccordionContent>
@@ -106,7 +108,7 @@ const LoanSummary: React.FC<LoanSummaryProps> = ({
                             </div>
                         </AccordionContent>
                     </AccordionItem>
-                </Accordion>
+                </Accordion>}
             </div>
         </div >
     );

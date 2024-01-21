@@ -4,9 +4,16 @@ import { ColumnDef } from "@tanstack/react-table"
 import { motion } from "framer-motion"
 
 export type InterfaceNFT = {
-    imageUrl: string
+    tokenId?: number,
+    balance?: bigint,
+    tokenUri?: string, //ipfs
+    imageUrl: string, // https
+    tokenType?: string,
+    contractAddress?: string,
+    name?: string,
     description: string
-    price: number
+    price: string
+    loanId?: number
 }
 
 export const columns: ColumnDef<InterfaceNFT>[] = [
@@ -26,8 +33,11 @@ export const columns: ColumnDef<InterfaceNFT>[] = [
         },
     },
     {
-        accessorKey: "description",
-        header: "Description",
+        accessorKey: "name",
+        header: "Title",
+        cell: ({ row }) => {
+            return row.getValue("name") || <span className="opacity-50">No title</span>
+        }
     },
     {
         accessorKey: "price",
@@ -35,7 +45,7 @@ export const columns: ColumnDef<InterfaceNFT>[] = [
         cell: ({ row }) => {
             return (
                 <div className="flex items-center">
-                    {row.getValue("price")} ETH
+                    {(row.getValue("price") as number).toLocaleString('en-US')} USDC
                 </div>
             );
         }
