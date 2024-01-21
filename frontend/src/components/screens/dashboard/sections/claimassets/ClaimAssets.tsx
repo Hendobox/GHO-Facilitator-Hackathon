@@ -61,6 +61,7 @@ export default function ClaimAssetsSection({ loanRepayment }: ClaimAssetsProps) 
             (async () => {
                 const nfts = await getStakeNFTsUser(account)
                 setData(nfts)
+                console.log("bal claim " + nfts[0].balance)
             })()
         }
     }, [account, data.length, setData])

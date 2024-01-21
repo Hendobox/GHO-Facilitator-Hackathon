@@ -8,7 +8,7 @@ import LoanTerms from "./steps/loanTerms/LoanTerms"
 import GetApproval from "./steps/getApproval/GetApproval"
 import ChooseProduct from "./steps/chooseProduct/ChooseProduct"
 import { useAccount } from "wagmi"
-import { startLoan } from "@/contract/loanHandler"
+import { nftApproval, startLoan } from "@/contract/loanHandler"
 import { useToast } from "@/components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
 
@@ -31,7 +31,20 @@ export default function Borrow() {
         const facilitator = productType == "borrow" ? 1 : 0; // 0 is native, 1 is aave
         const collateralAddress = nftData.contractAddress || "0x8c427C56790f2C36664870a55B3A0189bFf9996d"
         const collateralId = BigInt(nftData.tokenId || 0)
-        const principal = BigInt(loanAmount * (10 ** 18)) // convert decimal to bigint
+        const principal = BigInt(loanAmount * (10 ** 6)) // convert decimal to bigint
+
+        const nfthash = await nftApproval(
+            account,
+            { id: chain },
+            collateralAddress,
+            collateralId
+        )
+
+        toast({
+            title: "NFT Approval Transaction Hash",
+            description: `${nfthash}%`,
+            variant: "ghost"
+        });
 
         const hash = await startLoan(
             account,

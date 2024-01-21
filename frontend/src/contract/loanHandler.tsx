@@ -10,7 +10,7 @@ const LoanCoreABI = LoanCoreArtifact.abi;
 const NftABI = NftArtifact.abi;
 const GhoTokenABI = GhoArtifact.abi
 
-const unHODLContractAddress = '0x0886073e6c0da2cE601D1eC846cE2B7E0294b91E';
+const unHODLContractAddress = '0x0Ca73475715E42C559714F10274CadAacA3124A2';
 
 async function calculateInterestRate(account: any, loanAmount: bigint) {
     const client = await account.connector?.getWalletClient();
@@ -47,17 +47,12 @@ async function calculateInterestRate(account: any, loanAmount: bigint) {
 //     repayDebt(account, { id: chain }, { loanId: 100n, amount: 100000000000000n });
 // }
 
-async function startLoan(
+async function nftApproval(
     account: any,
     chain: any,
-    {
-        collateralAddress,
-        collateralId,
-        principal,
-        facilitator
-    }: LoanTerms,
+    collateralAddress: string,
+    collateralId: bigint
 ) {
-
     const client: WalletClient = await account.connector?.getWalletClient()
 
     const nfthash = await client.writeContract(
@@ -75,6 +70,38 @@ async function startLoan(
     )
 
     console.log(`NFT approved txn: ${nfthash}`)
+
+    return nfthash
+}
+
+async function startLoan(
+    account: any,
+    chain: any,
+    {
+        collateralAddress,
+        collateralId,
+        principal,
+        facilitator
+    }: LoanTerms,
+) {
+
+    const client: WalletClient = await account.connector?.getWalletClient()
+
+    // const nfthash = await client.writeContract(
+    //     {
+    //         address: collateralAddress as `0x${string}`,
+    //         abi: NftABI,
+    //         functionName: 'approve',
+    //         chain: chain,
+    //         account: client.account.address,
+    //         args: [
+    //             unHODLContractAddress,
+    //             collateralId
+    //         ]
+    //     }
+    // )
+
+    // console.log(`NFT approved txn: ${nfthash}`)
 
     const hash = await client.writeContract(
         {
@@ -237,4 +264,4 @@ async function getGhoBalance(account: any) {
     return balance
 }
 
-export { getGhoBalance, startLoan, repayDebt, getLoans, calculateInterestRate };
+export { getGhoBalance, nftApproval, startLoan, repayDebt, getLoans, calculateInterestRate };

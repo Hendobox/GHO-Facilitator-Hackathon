@@ -2,7 +2,7 @@ import { DropDownSelect } from "@/components/ui/dashboard/DropDownSelect"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/use-toast"
 import { repayDebt } from "@/contract/loanHandler"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useAccount } from "wagmi"
 
 function NoActiveLoan() {
@@ -45,13 +45,14 @@ function ActiveLoan({ balance,
             });
         }
 
-        if (loanId && balance && BigInt(balance) >= BigInt(0)) {
+        // if (loanId && balance && BigInt(balance) >= BigInt(0)) {
+        else {
             const hash = await repayDebt(
                 account,
                 { id: chain },
                 {
-                    loanId: BigInt(loanId),
-                    amount: BigInt(amount * (10 ** 18))
+                    loanId: BigInt(loanId ?? 0),
+                    amount: BigInt(amount * (10 ** 6))
                 }
             )
 
@@ -63,6 +64,10 @@ function ActiveLoan({ balance,
         }
     }
 
+    useEffect(() => {
+        console.log("repay " + balance)
+    })
+
     return (
         <>
             <div className="mt-4 relative flex flex-row w-full items-start">
@@ -72,7 +77,9 @@ function ActiveLoan({ balance,
                         Due amount
                     </div>
                     <div className="text-xl font-semibold tracking-[-0.1] leading-[28px] text-white">
-                        {(balance)?.toLocaleString('en-IN')}
+                        {
+                            parseFloat((balance)?.toString() ?? "0") / (10 ** 6)
+                        }
                     </div>
                 </div>
             </div >
