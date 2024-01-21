@@ -10,7 +10,7 @@ const LoanCoreABI = LoanCoreArtifact.abi;
 const NftABI = NftArtifact.abi;
 const GhoTokenABI = GhoArtifact.abi
 
-const unHODLContractAddress = '0x0Ca73475715E42C559714F10274CadAacA3124A2';
+const unHODLContractAddress = '0xD7aD2DEf2A84006C7ABbF04794997E206856614f';
 
 async function calculateInterestRate(account: any, loanAmount: bigint) {
     const client = await account.connector?.getWalletClient();
