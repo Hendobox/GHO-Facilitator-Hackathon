@@ -114,7 +114,8 @@ async function getLoans(account: any): Promise<LoanData[]> {
         const loan = await publicActions(client).readContract({
             address: unHODLContractAddress,
             abi: LoanCoreABI,
-            functionName: 'loanId',
+            functionName: 'getLoan',
+            // functionName: 'loanId',
             account: client.account.address,
             args: [index],
         }) as LoanData;
