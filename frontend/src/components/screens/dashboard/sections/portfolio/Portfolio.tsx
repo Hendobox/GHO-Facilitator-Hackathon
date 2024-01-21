@@ -69,9 +69,9 @@ export default function PortfolioSection() {
             (async () => {
                 const ghoBalance = await getGhoBalance(account)
                 console.log("Portfolio " + ghoBalance)
-                console.log("Converted Gho " + (BigInt(ghoBalance) / BigInt(10 ** 6)).toString())
+                console.log("Converted Gho " + (BigInt(ghoBalance) / BigInt(10 ** 18)).toString())
                 setBalance(
-                    (parseFloat(ghoBalance.toString()) / (10 ** 6)).toString()
+                    (parseFloat(ghoBalance.toString()) / (10 ** 18)).toFixed(20).toString()
                 )
             })()
         }

@@ -52,7 +52,7 @@ function ActiveLoan({ balance,
                 { id: chain },
                 {
                     loanId: BigInt(loanId ?? 0),
-                    amount: BigInt(amount * (10 ** 6))
+                    amount: BigInt(amount * (10 ** 18))
                 }
             )
 
@@ -78,7 +78,7 @@ function ActiveLoan({ balance,
                     </div>
                     <div className="text-xl font-semibold tracking-[-0.1] leading-[28px] text-white">
                         {
-                            parseFloat((balance)?.toString() ?? "0") / (10 ** 6)
+                            parseFloat((balance)?.toString() ?? "0") / (10 ** 18)
                         }
                     </div>
                 </div>

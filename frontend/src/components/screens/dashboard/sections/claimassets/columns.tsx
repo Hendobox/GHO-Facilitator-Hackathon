@@ -46,7 +46,7 @@ export const columns: ColumnDef<InterfaceNFT>[] = [
             console.log("Columns " + balance)
             return (
                 <div className="flex items-center">
-                    {parseFloat(balance) / (10 ** 6)} GHO
+                    {(parseFloat(balance) / (10 ** 18)).toFixed(4)} GHO
                 </div>
             );
         }
