@@ -119,7 +119,7 @@ export default function Borrow() {
     }
 
     return (
-        <div className="h-[calc(85vh-105px)] flex flex-col justify-start text-white px-28 border-t-[1px] border-[#3F3F46]">
+        <div className="min-h-[calc(85vh-105px)] pb-10 flex flex-col justify-start text-white px-28 border-t-[1px] border-[#3F3F46]">
             <div>
                 <BorrowHeader step={step} productType={productType} />
                 {renderScreen()}

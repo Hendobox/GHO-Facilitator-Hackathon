@@ -8,7 +8,6 @@ import { DataTable } from "./data-table"
 
 async function getData(account: GetAccountResult<PublicClient>): Promise<InterfaceNFT[]> {
     const nfts = await fetchNFTsUser(account)
-    console.log("🚀 ~ getData ~ nfts:", nfts)
     return nfts;
 
     // const nft1 = {
