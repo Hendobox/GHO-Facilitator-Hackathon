@@ -1,24 +1,11 @@
-import { ConnectKitButton, useModal } from "connectkit";
+import { ConnectKitButton } from "connectkit";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAccount } from "wagmi";
+import { Link } from "react-router-dom";
+import useLaunchButton from "../hooks/useLaunchButton";
 
-const REDIRECT_ON_CONNECT = "/borrow";
 
 export default function NavBar() {
-    const [launch, setLaunch] = useState(false);
-    const navigate = useNavigate();
-    const { setOpen } = useModal();
-    const { isConnected } = useAccount();
-    const location = useLocation();
-
-    useEffect(() => {
-        if (launch && isConnected) {
-            navigate(REDIRECT_ON_CONNECT);
-            setLaunch(false);
-        }
-    }, [launch, setOpen, isConnected, navigate]);
+    const { onLaunchClick, isConnected } = useLaunchButton();
 
     return (
         <nav className="flex flex-row px-28 py-8 justify-between text-white">
@@ -49,14 +36,7 @@ export default function NavBar() {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.8 }}
                             className="bg-violet-700 rounded-md py-2 px-4"
-                            onClick={() => {
-                                if (isConnected) {
-                                    navigate(REDIRECT_ON_CONNECT);
-                                    return;
-                                }
-                                setLaunch(true);
-                                setOpen(true);
-                            }}
+                            onClick={onLaunchClick}
                         >
                             Launch App
                         </motion.button>
