@@ -23,6 +23,7 @@ interface LoanSummaryProps {
 }
 
 const LoanSummary: React.FC<LoanSummaryProps> = ({
+    chosenProduct,
     selectedNFT,
     receiverAddress,
     loanAmount,
@@ -57,7 +58,7 @@ const LoanSummary: React.FC<LoanSummaryProps> = ({
                     <span className="mt-5 text-sm text-zinc-400">Receiver address</span>
                     <span>{receiverAddress}</span>
                 </div>
-                <Accordion defaultValue="item-1" type="single" className="px-6 border-[1px] rounded-[8px] border-zinc-700">
+                {chosenProduct !== "stake" && <Accordion defaultValue="item-1" type="single" className="px-6 border-[1px] rounded-[8px] border-zinc-700">
                     <AccordionItem value="item-1">
                         <AccordionTrigger>Loan Information</AccordionTrigger>
                         <AccordionContent>
@@ -82,7 +83,8 @@ const LoanSummary: React.FC<LoanSummaryProps> = ({
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
-                <Accordion defaultValue="item-2" type="single" className="px-6 border-[1px] rounded-[8px] border-zinc-700">
+                }
+                {chosenProduct !== "borrow" && <Accordion defaultValue="item-2" type="single" className="px-6 border-[1px] rounded-[8px] border-zinc-700">
                     <AccordionItem value="item-2">
                         <AccordionTrigger>Stake Information</AccordionTrigger>
                         <AccordionContent>
@@ -106,7 +108,7 @@ const LoanSummary: React.FC<LoanSummaryProps> = ({
                             </div>
                         </AccordionContent>
                     </AccordionItem>
-                </Accordion>
+                </Accordion>}
             </div>
         </div >
     );
