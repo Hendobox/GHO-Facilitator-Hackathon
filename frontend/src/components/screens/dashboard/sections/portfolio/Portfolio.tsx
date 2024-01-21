@@ -93,11 +93,11 @@ export default function PortfolioSection() {
                 </div>
             </div>
 
-            <div className="m-10" >
+            <div className="my-10" >
                 <AccordionCard title="Stake">
                     <StakeAccordionCard />
                 </AccordionCard>
-                <div className="mt-10" />
+                <div className="mt-6" />
                 <AccordionCard title="Withdraw">
                     <WithdrawAccordionCard />
                 </AccordionCard>

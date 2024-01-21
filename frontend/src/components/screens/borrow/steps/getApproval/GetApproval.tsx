@@ -38,7 +38,7 @@ const LoanSummary: React.FC<LoanSummaryProps> = ({
     return (
         <div className="flex flex-row gap-10">
             <div className="flex flex-col gap-6">
-                <img className="rounded-[8px]" src={nft.imageUrl} alt={nft.description} />
+                <img className="rounded-[8px] max-w-[400px] max-h-[400px]" src={nft.imageUrl} alt={nft.description} />
                 <div className="flex flex-row justify-between">
                     <div className="flex flex-col">
                         <span className="text-sm text-zinc-400">Asset</span>
