@@ -45,7 +45,7 @@ export const columns: ColumnDef<InterfaceNFT>[] = [
         cell: ({ row }) => {
             return (
                 <div className="flex items-center">
-                    {row.getValue("price")} USDC
+                    {(row.getValue("price") as number).toLocaleString('en-US')} USDC
                 </div>
             );
         }
